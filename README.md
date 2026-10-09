@@ -63,3 +63,10 @@ Nenhum dado pessoal vai nos eventos. Os parâmetros enviados são apenas `conten
 - O botão "voltar" do celular volta uma etapa em vez de sair do quiz, e as UTMs da URL são mantidas.
 - O CNPJ aceita o formato numérico e o novo formato alfanumérico da Receita Federal.
 - A ilustração da abertura é abstrata (gota e anéis da marca). Nenhuma embalagem oficial foi recriada. As logos MZ3 e Keratex em `public/brand/` vêm do site oficial; a logo DEC Rio Piranhas (parceira) foi recortada de `src/assets/Logo Rio Piranhas.png`.
+
+## Deploy (Easypanel / Nixpacks)
+
+- Node 22 é fixado em `package.json` (`engines`) e `.nvmrc`, porque o Tailwind v4 exige Node 20 ou superior.
+- `nixpacks.toml` instala o Caddy, roda `npm ci` e `npm run build`, e inicia o servidor com o `Caddyfile` do projeto.
+- O `Caddyfile` serve **somente `/app/dist`**, com o MIME correto, cache longo para `/assets/*`, `no-cache` no `index.html` e fallback para o `index.html`.
+- Variáveis `VITE_*` são lidas no momento do build: configure-as no Easypanel e faça um novo deploy sempre que alterá-las.

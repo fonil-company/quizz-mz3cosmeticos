@@ -1,0 +1,12 @@
+# Configuração explícita do deploy (Easypanel usa Nixpacks).
+[phases.setup]
+nixPkgs = ["...", "caddy"]
+
+[phases.install]
+cmds = ["npm ci"]
+
+[phases.build]
+cmds = ["npm run build"]
+
+[start]
+cmd = "caddy run --config /app/Caddyfile --adapter caddyfile"

@@ -1,0 +1,24 @@
+# Servidor de produção (Easypanel/Nixpacks): serve somente o build em /app/dist.
+{
+	admin off
+	auto_https off
+	persist_config off
+}
+
+:{$PORT:80} {
+	root * {$SITE_ROOT:/app/dist}
+	encode zstd gzip
+
+	# Arquivos com hash no nome podem ficar em cache por 1 ano; o index.html nunca.
+	@assets path /assets/*
+	header @assets Cache-Control "public, max-age=31536000, immutable"
+	@html path / /index.html
+	header @html Cache-Control "no-cache"
+
+	# Garante o MIME correto dos módulos JS mesmo em containers sem /etc/mime.types.
+	@js path *.js
+	header @js Content-Type "text/javascript; charset=utf-8"
+
+	try_files {path} /index.html
+	file_server
+}
