@@ -1,0 +1,67 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-navy: #020353;
+  --color-navy-deep: #01022f;
+  --color-navy-soft: #0a0c66;
+  --color-brand: #ff7900;
+  --color-brand-strong: #e86d00;
+  --color-mist: #e8e9ef;
+  --color-gold: #d9a441;
+
+  --font-display: 'Montserrat', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    margin: 0;
+    background: var(--color-navy);
+    color: #fff;
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  ::selection {
+    background: var(--color-brand);
+    color: #fff;
+  }
+  input,
+  select {
+    font-size: 16px; /* evita zoom automático no iOS */
+  }
+}
+
+@layer components {
+  .headline {
+    font-family: var(--font-display);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    line-height: 1.12;
+    text-wrap: balance;
+  }
+  .focus-ring {
+    outline: none;
+  }
+  .focus-ring:focus-visible {
+    box-shadow:
+      0 0 0 2px var(--color-navy),
+      0 0 0 4px var(--color-brand);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
