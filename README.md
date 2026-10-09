@@ -67,6 +67,7 @@ Nenhum dado pessoal vai nos eventos. Os parâmetros enviados são apenas `conten
 ## Deploy (Easypanel / Nixpacks)
 
 - Node 22 é fixado em `package.json` (`engines`) e `.nvmrc`, porque o Tailwind v4 exige Node 20 ou superior.
-- `nixpacks.toml` instala o Caddy, roda `npm ci` e `npm run build`, e inicia o servidor com o `Caddyfile` do projeto.
+- O provider Vite do Nixpacks instala o Caddy automaticamente na fase `caddy`. Não adicione `caddy` em `phases.setup.nixPkgs`: isso instala versões de snapshots Nix diferentes e causa conflito em `caddy-api.service`.
+- `nixpacks.toml` roda `npm ci` e `npm run build`, e inicia o servidor com o `Caddyfile` do projeto. Mantenha a detecção automática habilitada (não defina `NIXPACKS_SPA_CADDY=false` no Easypanel).
 - O `Caddyfile` serve **somente `/app/dist`**, com o MIME correto, cache longo para `/assets/*`, `no-cache` no `index.html` e fallback para o `index.html`.
 - Variáveis `VITE_*` são lidas no momento do build: configure-as no Easypanel e faça um novo deploy sempre que alterá-las.

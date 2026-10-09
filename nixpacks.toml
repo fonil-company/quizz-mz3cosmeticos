@@ -1,6 +1,7 @@
 # Configuração explícita do deploy (Easypanel usa Nixpacks).
-[phases.setup]
-nixPkgs = ["...", "caddy"]
+# O provider Vite do Nixpacks instala o Caddy na fase `caddy`.
+# Não o adicione também em `setup`: os snapshots Nix usam versões diferentes
+# e geram conflito de arquivos (caddy-api.service) ao montar o ambiente.
 
 [phases.install]
 cmds = ["npm ci"]
