@@ -9,15 +9,21 @@
  * O header `Idempotency-Key` é mantido apenas no backend/proxy genérico:
  * os webhooks estaduais não permitem esse header no CORS.
  * Só retorna `ok` quando ao menos um destino responde 2xx — nunca simula sucesso.
+ * `crmOk` indica a confirmação do CRM Fonil, que é o que libera o evento Lead do Pixel/CAPI.
  */
 import { CRM_ENDPOINTS, FONIL_CRM_PATH, crmEndpointFor } from '../config/env';
 import type { SubmissionStatus } from '../types';
 import type { LeadPayload } from './lead';
 
 export type SubmitResult = { status: Extract<SubmissionStatus, 'ok' | 'not_configured' | 'failed'>; httpStatus?: number };
+export type LeadSubmitResult = SubmitResult & { stateOk: boolean; crmOk: boolean };
+/** Destinos a enviar — permite reenviar só o que ainda não confirmou. */
+export type LeadTargets = { state: boolean; crm: boolean };
+
+const SKIPPED: SubmitResult = { status: 'not_configured' };
 
 const TIMEOUT_MS = 10_000;
-const inFlight = new Map<string, Promise<SubmitResult>>();
+const inFlight = new Map<string, Promise<LeadSubmitResult>>();
 
 /** Contrato do webhook do CRM Fonil (POST /api/webhooks/leads/{token}). */
 export interface FonilCrmPayload {
@@ -79,22 +85,25 @@ function submitToFonilCrm(payload: LeadPayload): Promise<SubmitResult> {
   return submitWithRetry(FONIL_CRM_PATH, buildFonilPayload(payload));
 }
 
-async function submitAll(payload: LeadPayload): Promise<SubmitResult> {
-  const results = await Promise.all([submitToStateWebhook(payload), submitToFonilCrm(payload)]);
+async function submitAll(payload: LeadPayload, targets: LeadTargets): Promise<LeadSubmitResult> {
+  const results = await Promise.all([
+    targets.state ? submitToStateWebhook(payload) : SKIPPED,
+    targets.crm ? submitToFonilCrm(payload) : SKIPPED,
+  ]);
   if (import.meta.env.DEV) console.info('[crm] webhook estadual / CRM Fonil:', results);
-  return (
+  const overall =
     results.find((r) => r.status === 'ok') ??
     results.find((r) => r.status === 'failed') ??
-    { status: 'not_configured' }
-  );
+    { status: 'not_configured' as const };
+  return { ...overall, stateOk: results[0].status === 'ok', crmOk: results[1].status === 'ok' };
 }
 
-export function submitLead(payload: LeadPayload): Promise<SubmitResult> {
+export function submitLead(payload: LeadPayload, targets: LeadTargets = { state: true, crm: true }): Promise<LeadSubmitResult> {
   const key = payload.lead_id;
   const existing = inFlight.get(key);
   if (existing) return existing;
 
-  const promise = submitAll(payload).finally(() => inFlight.delete(key));
+  const promise = submitAll(payload, targets).finally(() => inFlight.delete(key));
   inFlight.set(key, promise);
   return promise;
 }

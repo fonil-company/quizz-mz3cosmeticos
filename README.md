@@ -39,7 +39,7 @@ O envio acontece **no final do quiz**, após validar os dados de contato e o con
    - **Maranhão (`MA`) → webhook da Francisca.**
 2. **CRM Fonil** (`crm.fonilgroup.com.br`), no formato `{ phone, name, document, city, state }`. O webhook do CRM não libera CORS, então o navegador posta em `/api/crm-lead` (mesmo domínio) e o servidor repassa: o `Caddyfile` em produção e o proxy do `vite.config.ts` em `npm run dev`/`preview`. O token fica no servidor; para trocá-lo, defina `FONIL_CRM_TOKEN` nas variáveis de ambiente do Easypanel (e no `.env` local).
 
-O lead conta como salvo quando ao menos um destino responde 2xx.
+O lead conta como salvo quando ao menos um destino responde 2xx, mas o evento `Lead` do Pixel/CAPI depende só da confirmação do CRM Fonil.
 
 Selecionar ou trocar o estado não dispara um cadastro incompleto. O envio usa `POST` com `Content-Type: application/json`. O `lead_id` segue no corpo; os webhooks estaduais não recebem o header `Idempotency-Key`, pois o CORS deles não o permite. O backend/proxy genérico mantém esse header quando usado.
 
@@ -63,7 +63,7 @@ Se o endpoint não estiver configurado ou falhar, o quiz continua até o WhatsAp
 |---|---|
 | `PageView` | Ao carregar a página |
 | `ViewContent` | Na primeira pergunta (1x por sessão) |
-| `Lead` | Só depois de o CRM responder 2xx (1x por lead, `eventID = lead_id` para deduplicar com a CAPI) |
+| `Lead` | Só depois de o **CRM Fonil** confirmar o recebimento (HTTP 2xx). O webhook do estado não conta. 1x por lead, `eventID = lead_id` para deduplicar com a CAPI. Se o CRM falhar, a pessoa pode voltar e reenviar: o site tenta de novo só o CRM e, se confirmar, dispara o Lead. |
 | `Contact` | No clique do botão de WhatsApp (1x por lead) |
 
 Pixel ID: `1014610764961858`. O código base do Pixel fica **no `index.html`**, para o PageView disparar antes de o app baixar (melhor connect rate); o mesmo ID está em `src/config/env.ts` — se trocar, troque nos dois.

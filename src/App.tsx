@@ -65,17 +65,30 @@ function QuizFlow() {
       const payload = buildLeadPayload(state);
       const signature = leadSignature(payload);
 
-      // Já confirmado com os mesmos dados (ex.: voltou e avançou sem editar): não reenvia.
-      if (state.submission.status === 'ok' && state.submission.signature === signature) {
+      // Reenvia só aos destinos que ainda não confirmaram estes mesmos dados
+      // (ex.: voltou e avançou sem editar, ou o CRM falhou na primeira tentativa).
+      const targets = {
+        state: state.submission.stateSignature !== signature,
+        crm: state.submission.crmSignature !== signature,
+      };
+      if (!targets.state && !targets.crm) {
         next();
         return;
       }
 
       dispatch({ type: 'SUBMIT_START' });
-      const result = await submitLead(payload);
-      dispatch({ type: 'SUBMIT_DONE', status: result.status, signature });
+      const result = await submitLead(payload, targets);
+      const anyConfirmed = result.status === 'ok' || !targets.state || !targets.crm;
+      dispatch({
+        type: 'SUBMIT_DONE',
+        status: anyConfirmed ? 'ok' : result.status,
+        signature,
+        stateOk: result.stateOk,
+        crmOk: result.crmOk,
+      });
 
-      if (result.status === 'ok') {
+      // Lead só quando o CRM confirmou o recebimento (HTTP 2xx) — nunca por outro destino.
+      if (result.crmOk) {
         trackPixel(
           'Lead',
           { content_name: CONTENT_NAME, lead_quality: payload.qualification.priority },

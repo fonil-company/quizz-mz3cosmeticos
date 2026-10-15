@@ -4,7 +4,7 @@ import { CRM_ENDPOINTS, IS_DEV, META_PIXEL_ID } from '../config/env';
 import type { SubmissionStatus } from '../types';
 
 const STATUS_TEXT: Partial<Record<SubmissionStatus, { text: string; tone: 'ok' | 'warn' | 'error' }>> = {
-  ok: { text: 'CRM confirmou o recebimento do lead (HTTP 2xx). Detalhe por destino no console.', tone: 'ok' },
+  ok: { text: 'Lead salvo em ao menos um destino (HTTP 2xx). O evento Lead só dispara se o CRM Fonil confirmou — detalhe no console.', tone: 'ok' },
   not_configured: { text: 'Lead NÃO foi salvo: nenhum endpoint configurado para o estado selecionado.', tone: 'warn' },
   failed: { text: 'Lead NÃO foi salvo: webhook estadual e CRM Fonil falharam ou não responderam.', tone: 'error' },
 };

@@ -39,5 +39,9 @@ export interface QuizState {
     submittedAt?: string;
     /** Assinatura dos dados enviados com sucesso — evita reenvio idêntico. */
     signature?: string;
+    /** Assinatura dos dados que o webhook do estado confirmou (2xx). */
+    stateSignature?: string;
+    /** Assinatura dos dados que o CRM Fonil confirmou (2xx). Só então o evento Lead é disparado. */
+    crmSignature?: string;
   };
 }

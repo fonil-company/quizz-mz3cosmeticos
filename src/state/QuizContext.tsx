@@ -21,7 +21,7 @@ type Action =
   | { type: 'SET_LOCATION'; patch: Partial<LocationAnswer> }
   | { type: 'SET_CONTACT'; patch: Partial<ContactData> }
   | { type: 'SUBMIT_START' }
-  | { type: 'SUBMIT_DONE'; status: SubmissionStatus; signature?: string };
+  | { type: 'SUBMIT_DONE'; status: SubmissionStatus; signature?: string; stateOk?: boolean; crmOk?: boolean };
 
 function freshState(): QuizState {
   return {
@@ -81,6 +81,8 @@ function reducer(state: QuizState, action: Action): QuizState {
           status: action.status,
           submittedAt: new Date().toISOString(),
           signature: action.status === 'ok' ? action.signature : state.submission.signature,
+          stateSignature: action.stateOk ? action.signature : state.submission.stateSignature,
+          crmSignature: action.crmOk ? action.signature : state.submission.crmSignature,
         },
       };
     default:
