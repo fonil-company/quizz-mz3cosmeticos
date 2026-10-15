@@ -32,10 +32,14 @@ Em `npm run dev`, um botão amarelo no canto superior direito mostra o que falta
 
 ## Integração com o CRM
 
-O envio acontece **no final do quiz**, após validar os dados de contato e o consentimento. A UF selecionada determina um único destino:
+O envio acontece **no final do quiz**, após validar os dados de contato e o consentimento. Cada lead vai, em paralelo, para dois destinos:
 
-- **Piauí (`PI`) → webhook do Henrique.**
-- **Maranhão (`MA`) → webhook da Francisca.**
+1. **Webhook do estado** (payload completo abaixo):
+   - **Piauí (`PI`) → webhook do Henrique.**
+   - **Maranhão (`MA`) → webhook da Francisca.**
+2. **CRM Fonil** (`crm.fonilgroup.com.br`), no formato `{ phone, name, document, city, state }`. O webhook do CRM não libera CORS, então o navegador posta em `/api/crm-lead` (mesmo domínio) e o servidor repassa: o `Caddyfile` em produção e o proxy do `vite.config.ts` em `npm run dev`/`preview`. O token fica no servidor; para trocá-lo, defina `FONIL_CRM_TOKEN` nas variáveis de ambiente do Easypanel (e no `.env` local).
+
+O lead conta como salvo quando ao menos um destino responde 2xx.
 
 Selecionar ou trocar o estado não dispara um cadastro incompleto. O envio usa `POST` com `Content-Type: application/json`. O `lead_id` segue no corpo; os webhooks estaduais não recebem o header `Idempotency-Key`, pois o CORS deles não o permite. O backend/proxy genérico mantém esse header quando usado.
 

@@ -6,19 +6,39 @@
 }
 
 :{$PORT:80} {
-	root * {$SITE_ROOT:/app/dist}
 	encode zstd gzip
 
-	# Arquivos com hash no nome podem ficar em cache por 1 ano; o index.html nunca.
-	@assets path /assets/*
-	header @assets Cache-Control "public, max-age=31536000, immutable"
-	@html path / /index.html
-	header @html Cache-Control "no-cache"
+	# Lead → CRM Fonil. O webhook do CRM não libera CORS, então o navegador posta
+	# no mesmo domínio e o Caddy repassa. O token fica só no servidor
+	# (sobrescreva com a variável FONIL_CRM_TOKEN no Easypanel, se mudar).
+	@crmLead {
+		method POST
+		path /api/crm-lead
+	}
+	handle @crmLead {
+		rewrite * /api/webhooks/leads/{$FONIL_CRM_TOKEN:cmpsco6tj00036wt3kna7cp5b}
+		reverse_proxy https://crm.fonilgroup.com.br {
+			header_up Host {upstream_hostport}
+			header_up -Origin
+			header_up -Referer
+			header_up -Cookie
+		}
+	}
 
-	# Garante o MIME correto dos módulos JS mesmo em containers sem /etc/mime.types.
-	@js path *.js
-	header @js Content-Type "text/javascript; charset=utf-8"
+	handle {
+		root * {$SITE_ROOT:/app/dist}
 
-	try_files {path} /index.html
-	file_server
+		# Arquivos com hash no nome podem ficar em cache por 1 ano; o index.html nunca.
+		@assets path /assets/*
+		header @assets Cache-Control "public, max-age=31536000, immutable"
+		@html path / /index.html
+		header @html Cache-Control "no-cache"
+
+		# Garante o MIME correto dos módulos JS mesmo em containers sem /etc/mime.types.
+		@js path *.js
+		header @js Content-Type "text/javascript; charset=utf-8"
+
+		try_files {path} /index.html
+		file_server
+	}
 }

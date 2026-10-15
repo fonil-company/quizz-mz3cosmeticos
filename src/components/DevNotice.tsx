@@ -4,9 +4,9 @@ import { CRM_ENDPOINTS, IS_DEV, META_PIXEL_ID } from '../config/env';
 import type { SubmissionStatus } from '../types';
 
 const STATUS_TEXT: Partial<Record<SubmissionStatus, { text: string; tone: 'ok' | 'warn' | 'error' }>> = {
-  ok: { text: 'CRM confirmou o recebimento do lead (HTTP 2xx).', tone: 'ok' },
+  ok: { text: 'CRM confirmou o recebimento do lead (HTTP 2xx). Detalhe por destino no console.', tone: 'ok' },
   not_configured: { text: 'Lead NÃO foi salvo: nenhum endpoint configurado para o estado selecionado.', tone: 'warn' },
-  failed: { text: 'Lead NÃO foi salvo: o endpoint de CRM falhou ou não respondeu.', tone: 'error' },
+  failed: { text: 'Lead NÃO foi salvo: webhook estadual e CRM Fonil falharam ou não responderam.', tone: 'error' },
 };
 
 /** Painel visível apenas em desenvolvimento (npm run dev). Nunca aparece no build de produção. */

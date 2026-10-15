@@ -34,6 +34,12 @@ export function crmEndpointFor(uf: string): string {
   return CRM_ENDPOINT;
 }
 
+/**
+ * CRM Fonil: rota no mesmo domínio que o servidor (Caddyfile / vite.config.ts) repassa
+ * ao webhook do CRM — o webhook não libera CORS.
+ */
+export const FONIL_CRM_PATH: string = (import.meta.env.VITE_FONIL_CRM_PATH ?? '').trim() || '/api/crm-lead';
+
 /** ID do Meta Pixel. Vazio = eventos desativados. */
 export const META_PIXEL_ID: string = (import.meta.env.VITE_META_PIXEL_ID ?? '').trim();
 
