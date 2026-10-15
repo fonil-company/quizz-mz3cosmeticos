@@ -1,16 +1,22 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-navy: #020353;
-  --color-navy-deep: #01022f;
-  --color-navy-soft: #0a0c66;
-  --color-brand: #ff7900;
-  --color-brand-strong: #e86d00;
-  --color-mist: #e8e9ef;
-  --color-gold: #d9a441;
+  /* Paleta cobre / caramelo / marrom */
+  --color-ink: #4b1008;
+  --color-copper: #9b421c;
+  --color-caramel: #c67843;
+  --color-copper-light: #dc9464;
+  --color-champagne: #f5c49a;
+  --color-peach: #f8d4b1;
+  --color-cream: #fff0db;
+  --color-glow: #ffd6a1;
+  --color-script: #97502d;
+  --color-brand: #9b421c;
+  --color-brand-strong: #4b1008;
 
-  --font-display: 'Montserrat', ui-sans-serif, system-ui, sans-serif;
-  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Anton', 'Bebas Neue', 'Oswald', Impact, ui-sans-serif, sans-serif;
+  --font-script: 'Lobster', cursive;
+  --font-sans: 'Montserrat', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
 @layer base {
@@ -20,15 +26,16 @@
   }
   body {
     margin: 0;
-    background: var(--color-navy);
-    color: #fff;
+    background: linear-gradient(165deg, #87300f 0%, #c47543 38%, #e9a36f 70%, #f5c49a 100%) fixed;
+    background-color: #c47543;
+    color: var(--color-ink);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
   ::selection {
-    background: var(--color-brand);
-    color: #fff;
+    background: var(--color-copper);
+    color: var(--color-cream);
   }
   input,
   select {
@@ -39,19 +46,37 @@
 @layer components {
   .headline {
     font-family: var(--font-display);
-    font-weight: 800;
+    font-weight: 400; /* Anton já é ExtraBold por natureza */
     text-transform: uppercase;
-    letter-spacing: -0.01em;
-    line-height: 1.12;
+    letter-spacing: 0.01em;
+    line-height: 1.04;
     text-wrap: balance;
+  }
+  .script {
+    font-family: var(--font-script);
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  /* Gradiente "luxury copper" com brilho glossy */
+  .bg-luxury {
+    background:
+      linear-gradient(180deg, rgba(255, 214, 161, 0.28) 0%, rgba(255, 214, 161, 0) 48%),
+      linear-gradient(115deg, #4b1008 0%, #9b421c 60%, #c67843 100%);
+  }
+  .text-luxury {
+    background: linear-gradient(100deg, #4b1008 0%, #9b421c 55%, #c67843 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
   .focus-ring {
     outline: none;
   }
   .focus-ring:focus-visible {
     box-shadow:
-      0 0 0 2px var(--color-navy),
-      0 0 0 4px var(--color-brand);
+      0 0 0 2px var(--color-cream),
+      0 0 0 4px var(--color-copper);
   }
 }
 

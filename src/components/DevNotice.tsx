@@ -31,7 +31,7 @@ export function DevNotice({ submission, priority }: { submission: SubmissionStat
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="fixed right-3 top-3 z-50 grid h-9 w-9 place-items-center rounded-full bg-amber-300 text-navy shadow-lg"
+        className="fixed right-3 top-3 z-50 grid h-9 w-9 place-items-center rounded-full bg-amber-300 text-ink shadow-lg"
         aria-label="Abrir avisos de desenvolvimento"
       >
         <Wrench className="h-4 w-4" />

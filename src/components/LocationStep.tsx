@@ -63,7 +63,7 @@ export function LocationStep({ value, onChange, onContinue }: LocationStepProps)
       </div>
 
       {submitted && !value.state && (
-        <p role="alert" className="mt-3 flex items-center gap-1.5 text-[13px] text-red-300">
+        <p role="alert" className="mt-3 flex items-center gap-1.5 text-[13px] font-medium text-red-700">
           <AlertCircle className="h-3.5 w-3.5" aria-hidden="true" /> Selecione o estado do seu estabelecimento.
         </p>
       )}

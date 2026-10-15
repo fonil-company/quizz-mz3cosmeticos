@@ -180,6 +180,7 @@ export const WELCOME_COPY = {
   headlineBefore: 'Abasteça sua loja com a ',
   headlineHighlight: 'linha Keratex',
   headlineAfter: ' da MZ3 Cosméticos',
+  headlineOffer: '10% de desconto na primeira compra',
   subheadline:
     'Conheça nossa linha de óleos capilares e descubra como levar os produtos MZ3 para o seu estabelecimento.',
   support: 'Responda algumas perguntas rápidas para receber um atendimento comercial personalizado.',

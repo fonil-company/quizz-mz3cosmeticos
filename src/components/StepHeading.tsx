@@ -16,11 +16,11 @@ export function StepHeading({ title, subtitle, align = 'left' }: StepHeadingProp
 
   return (
     <div className={align === 'center' ? 'text-center' : ''}>
-      <h1 ref={ref} tabIndex={-1} className="headline text-[1.6rem] text-white outline-none sm:text-[1.9rem]">
+      <h1 ref={ref} tabIndex={-1} className="headline text-[1.9rem] text-ink outline-none sm:text-[2.3rem]">
         {title}
       </h1>
       {subtitle && (
-        <p className="mt-3 text-[15px] leading-relaxed text-white/70 sm:text-base">{subtitle}</p>
+        <p className="mt-3 text-[15px] leading-relaxed font-medium text-ink/75 sm:text-base">{subtitle}</p>
       )}
     </div>
   );

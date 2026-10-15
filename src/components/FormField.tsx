@@ -18,15 +18,15 @@ export const FormField = forwardRef<HTMLInputElement, FormFieldProps>(function F
   const errorId = `${id}-error`;
   return (
     <div className={className}>
-      <label htmlFor={id} className="mb-1.5 flex items-baseline justify-between font-display text-sm font-semibold text-white/90">
+      <label htmlFor={id} className="mb-1.5 flex items-baseline justify-between font-sans text-sm font-bold text-ink">
         {label}
-        {hint && <span className="font-sans text-xs font-normal text-white/45">{hint}</span>}
+        {hint && <span className="font-sans text-xs font-medium text-ink/55">{hint}</span>}
       </label>
       <div className="relative">
         {Icon && (
           <Icon
             className={`pointer-events-none absolute left-4 top-1/2 h-[18px] w-[18px] -translate-y-1/2 transition-colors ${
-              error ? 'text-red-300' : valid ? 'text-brand' : 'text-white/40'
+              error ? 'text-red-700' : valid ? 'text-copper' : 'text-ink/40'
             }`}
             aria-hidden="true"
           />
@@ -36,12 +36,12 @@ export const FormField = forwardRef<HTMLInputElement, FormFieldProps>(function F
           id={id}
           aria-invalid={!!error}
           aria-describedby={error ? errorId : undefined}
-          className={`h-14 w-full rounded-xl border bg-white/[0.06] text-white placeholder:text-white/35 transition-[border-color,background-color,box-shadow] duration-200 focus:bg-white/[0.09] focus:outline-none ${
+          className={`h-14 w-full rounded-xl border bg-white/70 font-medium text-ink placeholder:font-normal placeholder:text-ink/40 transition-[border-color,background-color,box-shadow] duration-200 focus:bg-white focus:outline-none ${
             Icon ? 'pl-11' : 'pl-4'
           } pr-4 ${
             error
-              ? 'border-red-400/80 focus:shadow-[0_0_0_3px_rgba(248,113,113,0.25)]'
-              : 'border-white/15 hover:border-white/30 focus:border-brand focus:shadow-[0_0_0_3px_rgba(255,121,0,0.25)]'
+              ? 'border-red-600/70 focus:shadow-[0_0_0_3px_rgba(220,38,38,0.18)]'
+              : 'border-ink/15 hover:border-copper/45 focus:border-copper focus:shadow-[0_0_0_3px_rgba(155,66,28,0.2)]'
           }`}
           {...props}
         />
@@ -55,7 +55,7 @@ export const FormField = forwardRef<HTMLInputElement, FormFieldProps>(function F
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="flex items-center gap-1.5 overflow-hidden pt-1.5 text-[13px] text-red-300"
+            className="flex items-center gap-1.5 overflow-hidden pt-1.5 text-[13px] font-medium text-red-700"
           >
             <AlertCircle className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
             {error}

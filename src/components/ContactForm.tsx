@@ -71,18 +71,18 @@ export function ContactForm({ value, cityUf, sending, onChange, onSubmit, onEdit
       <StepHeading title={C.title} subtitle={C.subtitle} />
 
       {cityUf && (
-        <div className="mt-5 flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm">
-          <span className="flex items-center gap-2 text-white/80">
-            <MapPin className="h-4 w-4 text-brand" aria-hidden="true" />
+        <div className="mt-5 flex items-center justify-between gap-3 rounded-xl border border-ink/10 bg-peach/45 px-4 py-3 text-sm">
+          <span className="flex items-center gap-2 text-ink/80">
+            <MapPin className="h-4 w-4 text-copper" aria-hidden="true" />
             <span>
-              <span className="text-white/50">Cidade/UF: </span>
-              <strong className="font-semibold text-white">{cityUf}</strong>
+              <span className="text-ink/55">Cidade/UF: </span>
+              <strong className="font-bold text-ink">{cityUf}</strong>
             </span>
           </span>
           <button
             type="button"
             onClick={onEditLocation}
-            className="focus-ring rounded-md px-1 text-xs font-semibold text-brand underline-offset-2 hover:underline"
+            className="focus-ring rounded-md px-1 text-xs font-bold text-copper underline-offset-2 hover:underline"
           >
             Alterar
           </button>
@@ -159,7 +159,7 @@ export function ContactForm({ value, cityUf, sending, onChange, onSubmit, onEdit
           <label
             htmlFor={consentId}
             className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-colors duration-200 ${
-              shown('consent') ? 'border-red-400/70 bg-red-400/5' : 'border-white/10 bg-white/[0.03] hover:border-white/25'
+              shown('consent') ? 'border-red-600/60 bg-red-50/60' : 'border-ink/12 bg-white/45 hover:border-copper/45'
             }`}
           >
             <span className="relative mt-0.5 grid h-5 w-5 shrink-0 place-items-center">
@@ -173,21 +173,21 @@ export function ContactForm({ value, cityUf, sending, onChange, onSubmit, onEdit
                   touch('consent')();
                 }}
                 aria-invalid={!!shown('consent')}
-                className="peer focus-ring absolute inset-0 h-5 w-5 cursor-pointer appearance-none rounded-md border border-white/35 bg-white/5 transition-colors checked:border-brand checked:bg-brand"
+                className="peer focus-ring absolute inset-0 h-5 w-5 cursor-pointer appearance-none rounded-md border border-ink/35 bg-white/80 transition-colors checked:border-copper checked:bg-copper"
               />
               <motion.span
                 initial={false}
                 animate={{ scale: value.consent ? 1 : 0 }}
                 transition={{ duration: 0.18 }}
-                className="pointer-events-none relative text-white"
+                className="pointer-events-none relative text-cream"
               >
                 <Check className="h-3.5 w-3.5" strokeWidth={3.5} aria-hidden="true" />
               </motion.span>
             </span>
-            <span className="text-[13px] leading-relaxed text-white/75">{C.consent}</span>
+            <span className="text-[13px] leading-relaxed text-ink/75">{C.consent}</span>
           </label>
           {shown('consent') && (
-            <p role="alert" className="flex items-center gap-1.5 pt-1.5 text-[13px] text-red-300">
+            <p role="alert" className="flex items-center gap-1.5 pt-1.5 text-[13px] font-medium text-red-700">
               <AlertCircle className="h-3.5 w-3.5" aria-hidden="true" /> {errors.consent}
             </p>
           )}
@@ -208,7 +208,7 @@ export function ContactForm({ value, cityUf, sending, onChange, onSubmit, onEdit
             </>
           )}
         </PrimaryButton>
-        <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-xs text-white/55">
+        <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-xs font-medium text-ink/60">
           <Lock className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
           {C.microcopy}
         </p>
