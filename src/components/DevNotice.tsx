@@ -1,11 +1,11 @@
 import { Wrench, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { CRM_ENDPOINT, IS_DEV, META_PIXEL_ID } from '../config/env';
+import { CRM_ENDPOINTS, IS_DEV, META_PIXEL_ID } from '../config/env';
 import type { SubmissionStatus } from '../types';
 
 const STATUS_TEXT: Partial<Record<SubmissionStatus, { text: string; tone: 'ok' | 'warn' | 'error' }>> = {
   ok: { text: 'CRM confirmou o recebimento do lead (HTTP 2xx).', tone: 'ok' },
-  not_configured: { text: 'Lead NÃO foi salvo: VITE_CRM_ENDPOINT não configurado.', tone: 'warn' },
+  not_configured: { text: 'Lead NÃO foi salvo: nenhum endpoint configurado para o estado selecionado.', tone: 'warn' },
   failed: { text: 'Lead NÃO foi salvo: o endpoint de CRM falhou ou não respondeu.', tone: 'error' },
 };
 
@@ -19,7 +19,7 @@ export function DevNotice({ submission, priority }: { submission: SubmissionStat
   if (!IS_DEV) return null;
 
   const issues = [
-    !CRM_ENDPOINT && 'VITE_CRM_ENDPOINT vazio — os leads não serão enviados ao CRM.',
+    (!CRM_ENDPOINTS.PI || !CRM_ENDPOINTS.MA) && 'Webhook de CRM ausente para um dos estados.',
     !META_PIXEL_ID && 'VITE_META_PIXEL_ID vazio — eventos do Pixel desativados.',
   ].filter(Boolean) as string[];
   const status = STATUS_TEXT[submission];

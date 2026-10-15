@@ -16,7 +16,8 @@ npm run build          # gera /dist (site estático)
 | Variável | Para quê |
 |---|---|
 | `VITE_WHATSAPP_NUMBER_PI` / `VITE_WHATSAPP_NUMBER_MA` | Opcional. Sobrescreve o WhatsApp de cada estado. Padrão em `src/config/env.ts` (`WHATSAPP_NUMBERS`): **Piauí → 5586993271298**, **Maranhão → 5586995319157**. Ao final, o lead é direcionado ao número do estado que marcou. |
-| `VITE_CRM_ENDPOINT` | URL do **seu backend/proxy** que recebe o lead (POST JSON) e repassa ao CRM. Tokens do CRM ficam no backend, nunca aqui. |
+| `VITE_CRM_ENDPOINT_PI` / `VITE_CRM_ENDPOINT_MA` | Opcionais. Sobrescrevem os webhooks por estado. Os webhooks fornecidos já estão configurados em `src/config/env.ts`: **Piauí → Henrique**, **Maranhão → Francisca**. |
+| `VITE_CRM_ENDPOINT` | Backend/proxy genérico, usado apenas como fallback para UFs sem webhook estadual. Não substitui os destinos de PI/MA. |
 | `VITE_META_PIXEL_ID` | ID do Pixel. Vazio = eventos desligados. |
 
 Em `npm run dev`, um botão amarelo no canto superior direito mostra o que falta configurar e se o lead foi realmente salvo. Ele não aparece no build de produção.
@@ -31,8 +32,14 @@ Em `npm run dev`, um botão amarelo no canto superior direito mostra o que falta
 
 ## Integração com o CRM
 
-`POST VITE_CRM_ENDPOINT` com `Content-Type: application/json` e o header `Idempotency-Key: <lead_id>`.
-O backend deve responder 2xx somente depois de gravar o lead e deve usar o `lead_id` para não duplicar registros (o usuário pode voltar, editar e reenviar: o `lead_id` é o mesmo). O backend também precisa liberar CORS para o domínio da página, incluindo o header `Idempotency-Key`.
+O envio acontece **no final do quiz**, após validar os dados de contato e o consentimento. A UF selecionada determina um único destino:
+
+- **Piauí (`PI`) → webhook do Henrique.**
+- **Maranhão (`MA`) → webhook da Francisca.**
+
+Selecionar ou trocar o estado não dispara um cadastro incompleto. O envio usa `POST` com `Content-Type: application/json`. O `lead_id` segue no corpo; os webhooks estaduais não recebem o header `Idempotency-Key`, pois o CORS deles não o permite. O backend/proxy genérico mantém esse header quando usado.
+
+O backend deve responder 2xx somente depois de gravar o lead e deve usar o `lead_id` para não duplicar registros (o usuário pode voltar, editar e reenviar: o `lead_id` é o mesmo). Deve liberar CORS para o domínio da página e `Content-Type`. As URLs de captação são públicas no navegador; credenciais privadas de acesso ao CRM ficam no backend.
 
 O payload inclui: contato (nome, empresa, WhatsApp, CNPJ ou `null`), cidade/UF, todas as respostas (id + rótulo), a qualificação (`priority`, `score`, `relationship_tag`, `tags`, `reasons`), o consentimento, as UTMs (`utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`), `fbclid`, a landing page e os horários (`started_at`, `submitted_at` em ISO e `submitted_at_local` no fuso de Fortaleza).
 
