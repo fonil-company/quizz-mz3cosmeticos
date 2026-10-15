@@ -5,16 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#87300F" />
     <meta name="description" content="Abasteça sua loja com a linha Keratex da MZ3 Cosméticos. Atendimento comercial para lojistas do Piauí e Maranhão." />
+    <title>MZ3 Cosméticos | Seja um Revendedor Keratex</title>
     <link rel="icon" type="image/png" href="/favicon-32x32.png" />
+
+    <!--
+      Meta Pixel no HTML: o PageView dispara antes de baixar o app (melhora o connect rate).
+      O eventID fica em window.__mz3PageViewId para a API de Conversões deduplicar (src/lib/pixel.ts).
+      Se trocar o ID aqui, troque também em src/config/env.ts.
+    -->
+    <script>
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      window.__mz3PageViewId = 'PageView.' + (window.crypto && crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
+      fbq('init', '1014610764961858');
+      fbq('track', 'PageView', {}, { eventID: window.__mz3PageViewId });
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://connect.facebook.net" />
+    <!-- Fontes sem bloquear a renderização; Lobster só com as letras de "linha Keratex". -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Anton&family=Lobster&family=Montserrat:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@500;600;700;800&display=swap"
+      media="print"
+      onload="this.media='all'"
     />
-    <title>MZ3 Cosméticos | Seja um Revendedor Keratex</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Lobster&display=swap&text=linhaKeratex%20"
+      media="print"
+      onload="this.media='all'"
+    />
+    <link rel="preload" as="image" href="/brand/keratex-brown.webp" type="image/webp" />
+
+    <!-- Fundo já na primeira pintura, antes do CSS/JS do app. -->
+    <style>
+      html,body{margin:0;min-height:100%;background:#c47543 linear-gradient(165deg,#87300f 0%,#c47543 38%,#e9a36f 70%,#f5c49a 100%) fixed}
+    </style>
   </head>
   <body>
+    <noscript><img height="1" width="1" style="display:none" alt=""
+      src="https://www.facebook.com/tr?id=1014610764961858&ev=PageView&noscript=1"
+    /></noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

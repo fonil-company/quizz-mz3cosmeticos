@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { AlertCircle, ArrowRight, MapPin } from 'lucide-react';
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { CITY_SUGGESTIONS, LOCATION_STEP as C, type StateOptionId } from '../config/quiz';
@@ -70,7 +70,7 @@ export function LocationStep({ value, onChange, onContinue }: LocationStepProps)
 
       <AnimatePresence initial={false}>
         {value.state && (
-          <motion.div
+          <m.div
             key="city"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
@@ -101,7 +101,7 @@ export function LocationStep({ value, onChange, onContinue }: LocationStepProps)
                 ))}
               </datalist>
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 

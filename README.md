@@ -66,7 +66,7 @@ Se o endpoint não estiver configurado ou falhar, o quiz continua até o WhatsAp
 | `Lead` | Só depois de o CRM responder 2xx (1x por lead, `eventID = lead_id` para deduplicar com a CAPI) |
 | `Contact` | No clique do botão de WhatsApp (1x por lead) |
 
-Pixel ID: `1014610764961858` (padrão em `src/config/env.ts`).
+Pixel ID: `1014610764961858`. O código base do Pixel fica **no `index.html`**, para o PageView disparar antes de o app baixar (melhor connect rate); o mesmo ID está em `src/config/env.ts` — se trocar, troque nos dois.
 
 Nenhum dado pessoal vai nos parâmetros dos eventos (apenas `content_name`, `content_category` e `lead_quality`).
 

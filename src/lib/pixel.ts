@@ -27,6 +27,8 @@ declare global {
   interface Window {
     fbq?: Fbq;
     _fbq?: Fbq;
+    /** eventID do PageView disparado pelo Pixel inline do index.html. */
+    __mz3PageViewId?: string;
   }
 }
 
@@ -54,9 +56,24 @@ function loadPixelScript(): void {
 
 export function initPixel(): void {
   if (initialized || !META_PIXEL_ID) return;
-  loadPixelScript();
-  window.fbq?.('init', META_PIXEL_ID);
+  // O index.html já carrega o Pixel e faz o init; repetir o init geraria aviso de ID duplicado.
+  if (!window.__mz3PageViewId) {
+    loadPixelScript();
+    window.fbq?.('init', META_PIXEL_ID);
+  }
   initialized = true;
+}
+
+/**
+ * PageView: o index.html já o envia ao Pixel logo no carregamento; aqui só falta a CAPI,
+ * com o mesmo eventID. Sem o Pixel inline (ex.: HTML alterado), dispara pelos dois canais.
+ */
+export function trackPageView(user: CapiUser): void {
+  const id = window.__mz3PageViewId;
+  if (!id) return trackPixel('PageView', {}, { scope: 'page', user });
+  if (firedThisPage.has('PageView')) return;
+  firedThisPage.add('PageView');
+  void sendCapiEvent('PageView', id, {}, user);
 }
 
 /**

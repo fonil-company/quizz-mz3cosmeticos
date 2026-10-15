@@ -1,5 +1,5 @@
 import { AlertCircle, type LucideIcon } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { forwardRef, useId, type InputHTMLAttributes } from 'react';
 
 interface FormFieldProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'id'> {
@@ -48,7 +48,7 @@ export const FormField = forwardRef<HTMLInputElement, FormFieldProps>(function F
       </div>
       <AnimatePresence initial={false}>
         {error && (
-          <motion.p
+          <m.p
             id={errorId}
             role="alert"
             initial={{ opacity: 0, height: 0 }}
@@ -59,7 +59,7 @@ export const FormField = forwardRef<HTMLInputElement, FormFieldProps>(function F
           >
             <AlertCircle className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
             {error}
-          </motion.p>
+          </m.p>
         )}
       </AnimatePresence>
     </div>

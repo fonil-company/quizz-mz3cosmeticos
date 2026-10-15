@@ -1,4 +1,4 @@
-import { motion, type HTMLMotionProps } from 'framer-motion';
+import { m, type HTMLMotionProps } from 'framer-motion';
 import type { ReactNode } from 'react';
 
 const base =
@@ -8,9 +8,9 @@ type ButtonProps = Omit<HTMLMotionProps<'button'>, 'children'> & { children: Rea
 
 export function PrimaryButton({ children, className = '', ...props }: ButtonProps) {
   return (
-    <motion.button whileTap={{ scale: 0.98 }} className={`${base} ${className}`} {...props}>
+    <m.button whileTap={{ scale: 0.98 }} className={`${base} ${className}`} {...props}>
       {children}
-    </motion.button>
+    </m.button>
   );
 }
 
@@ -18,8 +18,8 @@ type LinkProps = Omit<HTMLMotionProps<'a'>, 'children'> & { children: ReactNode 
 
 export function PrimaryLink({ children, className = '', ...props }: LinkProps) {
   return (
-    <motion.a whileTap={{ scale: 0.98 }} className={`${base} ${className}`} {...props}>
+    <m.a whileTap={{ scale: 0.98 }} className={`${base} ${className}`} {...props}>
       {children}
-    </motion.a>
+    </m.a>
   );
 }

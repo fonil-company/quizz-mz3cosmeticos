@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { AlertCircle, ArrowRight, Check, FileText, Loader2, Lock, MapPin, Phone, Store, User } from 'lucide-react';
 import { useId, useRef, useState, type FormEvent } from 'react';
 import { CONTACT_COPY as C } from '../config/quiz';
@@ -175,14 +175,14 @@ export function ContactForm({ value, cityUf, sending, onChange, onSubmit, onEdit
                 aria-invalid={!!shown('consent')}
                 className="peer focus-ring absolute inset-0 h-5 w-5 cursor-pointer appearance-none rounded-md border border-ink/35 bg-white/80 transition-colors checked:border-copper checked:bg-copper"
               />
-              <motion.span
+              <m.span
                 initial={false}
                 animate={{ scale: value.consent ? 1 : 0 }}
                 transition={{ duration: 0.18 }}
                 className="pointer-events-none relative text-cream"
               >
                 <Check className="h-3.5 w-3.5" strokeWidth={3.5} aria-hidden="true" />
-              </motion.span>
+              </m.span>
             </span>
             <span className="text-[13px] leading-relaxed text-ink/75">{C.consent}</span>
           </label>

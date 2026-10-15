@@ -34,19 +34,19 @@ export function QuizLayout({ children, progress, stepLabel, onBack }: QuizLayout
             {/* Parceria MZ3 + Rio Piranhas */}
             <div className="flex min-w-0 items-center justify-center gap-3 rounded-full bg-luxury px-4 py-2 shadow-[0_8px_20px_-10px_rgba(75,16,8,0.8)] sm:gap-4 sm:px-5">
               <img
-                src="/brand/mz3-logo.png"
+                src="/brand/mz3-logo.webp"
                 alt="MZ3 Cosméticos"
-                width={950}
-                height={445}
+                width={260}
+                height={122}
                 className="h-7 w-auto shrink-0 select-none sm:h-9"
                 draggable={false}
               />
               <span className="h-6 w-px shrink-0 bg-cream/35 sm:h-7" aria-hidden="true" />
               <img
-                src="/brand/rio-piranhas-logo.png"
+                src="/brand/rio-piranhas-logo.webp"
                 alt="DEC Rio Piranhas"
-                width={518}
-                height={119}
+                width={400}
+                height={92}
                 className="h-5 w-auto min-w-0 select-none sm:h-7"
                 draggable={false}
               />

@@ -14,10 +14,11 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
         <HairOilVisual />
         <div className="-mt-2 flex items-center justify-center">
           <img
-            src="/brand/keratex-brown.png"
+            src="/brand/keratex-brown.webp"
             alt="Keratex by MZ3 Cosméticos"
-            width={1335}
-            height={305}
+            width={520}
+            height={119}
+            decoding="async"
             className="h-10 w-auto sm:h-12"
             draggable={false}
           />

@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 
 interface ProgressBarProps {
   /** 0 a 1 */
@@ -17,7 +17,7 @@ export function ProgressBar({ value, label }: ProgressBarProps) {
       aria-valuenow={pct}
       className="h-1.5 w-full overflow-hidden rounded-full bg-ink/10"
     >
-      <motion.div
+      <m.div
         className="h-full rounded-full bg-gradient-to-r from-ink via-copper to-copper-light shadow-[0_0_10px_rgba(198,120,67,0.6)]"
         initial={false}
         animate={{ width: `${pct}%` }}

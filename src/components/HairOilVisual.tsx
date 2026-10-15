@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 
 /**
  * Ilustração abstrata da linha capilar: gota de óleo em tons cobre e caramelo envolta por anéis de luz.
@@ -30,7 +30,7 @@ export function HairOilVisual() {
         </g>
 
         {/* anel traseiro */}
-        <motion.ellipse
+        <m.ellipse
           cx="180" cy="122" rx="130" ry="34"
           fill="none" stroke="#4B1008" strokeOpacity="0.35" strokeWidth="2"
           transform="rotate(-10 180 122)"
@@ -41,17 +41,17 @@ export function HairOilVisual() {
         />
 
         {/* gota */}
-        <motion.g
+        <m.g
           animate={{ y: [0, -5, 0] }}
           transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
         >
           <path d="M180 22 C 180 22 136 82 136 114 a44 44 0 0 0 88 0 C 224 82 180 22 180 22 Z" fill="url(#oil)" />
           <path d="M162 92 C 158 104 158 118 164 130" stroke="#FFF7E0" strokeOpacity="0.75" strokeWidth="5" strokeLinecap="round" fill="none" />
           <circle cx="166" cy="80" r="3.5" fill="#FFF7E0" fillOpacity="0.8" />
-        </motion.g>
+        </m.g>
 
         {/* anel frontal laranja */}
-        <motion.ellipse
+        <m.ellipse
           cx="180" cy="122" rx="150" ry="42"
           fill="none" stroke="#9B421C" strokeWidth="3" strokeLinecap="round"
           transform="rotate(8 180 122)"

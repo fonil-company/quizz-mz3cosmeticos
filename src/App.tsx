@@ -1,4 +1,4 @@
-import { AnimatePresence, MotionConfig, motion, type Variants } from 'framer-motion';
+import { AnimatePresence, LazyMotion, MotionConfig, domAnimation, m, type Variants } from 'framer-motion';
 import { useEffect, useMemo, useRef } from 'react';
 import { ContactForm } from './components/ContactForm';
 import { DevNotice } from './components/DevNotice';
@@ -12,7 +12,7 @@ import { cityUf, optionLabel } from './lib/answers';
 import { submitLead } from './lib/crm';
 import type { CapiUser } from './lib/capi';
 import { buildLeadPayload, leadSignature, type LeadPayload } from './lib/lead';
-import { initPixel, trackPixel } from './lib/pixel';
+import { initPixel, trackPageView, trackPixel } from './lib/pixel';
 import { qualifyLead } from './lib/qualification';
 import { buildWhatsAppMessage, buildWhatsAppUrl, whatsAppNumberFor } from './lib/whatsapp';
 import { QuizProvider, useQuiz } from './state/QuizContext';
@@ -40,7 +40,7 @@ function QuizFlow() {
 
   useEffect(() => {
     initPixel();
-    trackPixel('PageView', {}, { scope: 'page', user: { externalId: state.leadId } });
+    trackPageView({ externalId: state.leadId });
   }, []);
 
   useEffect(() => {
@@ -164,7 +164,7 @@ function QuizFlow() {
       onBack={state.stepIndex > 0 && state.submission.status !== 'sending' ? back : undefined}
     >
       <AnimatePresence mode="wait" initial={false} custom={state.direction}>
-        <motion.div
+        <m.div
           key={step}
           custom={state.direction}
           variants={slide}
@@ -175,7 +175,7 @@ function QuizFlow() {
           className="flex flex-1 flex-col"
         >
           {renderStep()}
-        </motion.div>
+        </m.div>
       </AnimatePresence>
 
       <DevNotice
@@ -188,10 +188,12 @@ function QuizFlow() {
 
 export default function App() {
   return (
-    <MotionConfig reducedMotion="user">
-      <QuizProvider>
-        <QuizFlow />
-      </QuizProvider>
-    </MotionConfig>
+    <LazyMotion features={domAnimation} strict>
+      <MotionConfig reducedMotion="user">
+        <QuizProvider>
+          <QuizFlow />
+        </QuizProvider>
+      </MotionConfig>
+    </LazyMotion>
   );
 }

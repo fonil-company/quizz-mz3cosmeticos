@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Check } from 'lucide-react';
 import type { QuizOption } from '../config/quiz';
 
@@ -28,7 +28,7 @@ function LevelBars({ level, active }: { level: number; active: boolean }) {
 export function OptionCard({ option, selected, disabled, onSelect }: OptionCardProps) {
   const Icon = option.icon;
   return (
-    <motion.button
+    <m.button
       type="button"
       aria-pressed={selected}
       disabled={disabled}
@@ -62,10 +62,10 @@ export function OptionCard({ option, selected, disabled, onSelect }: OptionCardP
           selected ? 'border-copper bg-copper' : 'border-ink/25 group-hover:border-copper/60'
         }`}
       >
-        <motion.span initial={false} animate={{ scale: selected ? 1 : 0, opacity: selected ? 1 : 0 }} transition={{ duration: 0.2 }}>
+        <m.span initial={false} animate={{ scale: selected ? 1 : 0, opacity: selected ? 1 : 0 }} transition={{ duration: 0.2 }}>
           <Check className="h-3.5 w-3.5 text-cream" strokeWidth={3} />
-        </motion.span>
+        </m.span>
       </span>
-    </motion.button>
+    </m.button>
   );
 }

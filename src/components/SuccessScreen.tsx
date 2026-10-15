@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Check, ChevronDown } from 'lucide-react';
 import { SUCCESS_COPY as C } from '../config/quiz';
 import { WhatsAppButton } from './WhatsAppButton';
@@ -14,7 +14,7 @@ interface SuccessScreenProps {
 export function SuccessScreen({ saved, whatsappUrl, summary, onWhatsAppClick }: SuccessScreenProps) {
   return (
     <div className="flex flex-col items-center">
-      <motion.div
+      <m.div
         initial={{ scale: 0.6, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 260, damping: 18 }}
@@ -26,7 +26,7 @@ export function SuccessScreen({ saved, whatsappUrl, summary, onWhatsAppClick }: 
         <span className="relative grid h-12 w-12 place-items-center rounded-full bg-luxury shadow-[0_10px_30px_-8px_rgba(75,16,8,0.8)]">
           <Check className="h-6 w-6 text-cream" strokeWidth={3} />
         </span>
-      </motion.div>
+      </m.div>
 
       <StepHeading title={C.title} subtitle={saved ? C.subtitleSaved : C.subtitleUnsaved} align="center" />
 
