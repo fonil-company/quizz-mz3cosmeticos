@@ -10,13 +10,23 @@ import { WelcomeScreen } from './components/WelcomeScreen';
 import { QUESTIONS, TOTAL_STEPS, type ChoiceQuestionId } from './config/quiz';
 import { cityUf, optionLabel } from './lib/answers';
 import { submitLead } from './lib/crm';
-import { buildLeadPayload, leadSignature } from './lib/lead';
+import type { CapiUser } from './lib/capi';
+import { buildLeadPayload, leadSignature, type LeadPayload } from './lib/lead';
 import { initPixel, trackPixel } from './lib/pixel';
 import { qualifyLead } from './lib/qualification';
 import { buildWhatsAppMessage, buildWhatsAppUrl, whatsAppNumberFor } from './lib/whatsapp';
 import { QuizProvider, useQuiz } from './state/QuizContext';
 
 const CONTENT_NAME = 'Quiz Lojistas Keratex';
+
+/** Dados do lead para a API de Conversões (com hash em capi.ts). */
+const capiUser = (p: LeadPayload): CapiUser => ({
+  phone: p.contact.whatsapp,
+  name: p.contact.name,
+  city: p.location.city,
+  state: p.location.uf,
+  externalId: p.lead_id,
+});
 
 const slide: Variants = {
   enter: (dir: number) => ({ opacity: 0, x: dir * 36 }),
@@ -30,12 +40,16 @@ function QuizFlow() {
 
   useEffect(() => {
     initPixel();
-    trackPixel('PageView', {}, { scope: 'page' });
+    trackPixel('PageView', {}, { scope: 'page', user: { externalId: state.leadId } });
   }, []);
 
   useEffect(() => {
     if (step === 'establishment') {
-      trackPixel('ViewContent', { content_name: CONTENT_NAME, content_category: 'Qualificação B2B' });
+      trackPixel(
+        'ViewContent',
+        { content_name: CONTENT_NAME, content_category: 'Qualificação B2B' },
+        { user: { externalId: state.leadId } },
+      );
     }
     window.scrollTo({ top: 0 });
   }, [step]);
@@ -65,7 +79,7 @@ function QuizFlow() {
         trackPixel(
           'Lead',
           { content_name: CONTENT_NAME, lead_quality: payload.qualification.priority },
-          { onceKey: `Lead:${state.leadId}`, eventID: state.leadId },
+          { onceKey: `Lead:${state.leadId}`, eventID: state.leadId, user: capiUser(payload) },
         );
       }
       // O quiz segue mesmo sem CRM: a mensagem do WhatsApp leva os dados à equipe comercial.
@@ -76,7 +90,11 @@ function QuizFlow() {
   };
 
   const handleWhatsAppClick = () => {
-    trackPixel('Contact', { content_name: CONTENT_NAME }, { onceKey: `Contact:${state.leadId}` });
+    trackPixel(
+      'Contact',
+      { content_name: CONTENT_NAME },
+      { onceKey: `Contact:${state.leadId}`, eventID: `Contact.${state.leadId}`, user: capiUser(buildLeadPayload(state)) },
+    );
   };
 
   const summary = useMemo(() => {

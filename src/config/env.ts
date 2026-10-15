@@ -40,8 +40,15 @@ export function crmEndpointFor(uf: string): string {
  */
 export const FONIL_CRM_PATH: string = (import.meta.env.VITE_FONIL_CRM_PATH ?? '').trim() || '/api/crm-lead';
 
-/** ID do Meta Pixel. Vazio = eventos desativados. */
-export const META_PIXEL_ID: string = (import.meta.env.VITE_META_PIXEL_ID ?? '').trim();
+/** ID do Meta Pixel (público). Pode ser sobrescrito via VITE_META_PIXEL_ID. */
+export const META_PIXEL_ID: string = (import.meta.env.VITE_META_PIXEL_ID ?? '').trim() || '1014610764961858';
+
+/**
+ * Meta API de Conversões: rota no mesmo domínio que o servidor (Caddyfile / vite.config.ts)
+ * repassa à Graph API com o token META_CAPI_TOKEN. Use "off" para desativar.
+ */
+const capiPath = (import.meta.env.VITE_META_CAPI_PATH ?? '').trim();
+export const META_CAPI_PATH: string = capiPath === 'off' ? '' : capiPath || '/api/meta-capi';
 
 export const IS_DEV = import.meta.env.DEV;
 

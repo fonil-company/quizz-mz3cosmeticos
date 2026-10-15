@@ -1,13 +1,16 @@
 /**
- * Meta Pixel. Nunca envie nome, telefone, CNPJ, cidade ou qualquer dado pessoal nos parâmetros.
+ * Meta Pixel + API de Conversões. Nunca envie nome, telefone, CNPJ, cidade ou qualquer dado
+ * pessoal nos parâmetros: dados pessoais só vão à CAPI em `user_data`, com hash (ver capi.ts).
+ * Todo evento sai pelos dois canais com o mesmo `eventID`, para a Meta deduplicar.
  *
  * PageView     – acesso à página (1x por carregamento)
  * ViewContent  – visualização inicial do quiz (1x por sessão)
- * Lead         – cadastro confirmado pelo backend (1x por lead_id; eventID = lead_id para deduplicar com a CAPI)
+ * Lead         – cadastro confirmado pelo backend (1x por lead_id; eventID = lead_id)
  * Contact      – clique no botão de WhatsApp (1x por lead_id)
  */
 import { IS_DEV, META_PIXEL_ID } from '../config/env';
-import { readSession, writeSession } from './storage';
+import { sendCapiEvent, type CapiUser } from './capi';
+import { generateId, readSession, writeSession } from './storage';
 
 type PixelEvent = 'PageView' | 'ViewContent' | 'Lead' | 'Contact';
 type SafeParams = Record<string, string | number>;
@@ -63,7 +66,7 @@ export function initPixel(): void {
 export function trackPixel(
   event: PixelEvent,
   params: SafeParams = {},
-  opts: { onceKey?: string; scope?: 'page' | 'session'; eventID?: string } = {},
+  opts: { onceKey?: string; scope?: 'page' | 'session'; eventID?: string; user?: CapiUser } = {},
 ): void {
   const key = opts.onceKey ?? event;
   const scope = opts.scope ?? 'session';
@@ -77,5 +80,7 @@ export function trackPixel(
     if (IS_DEV) console.info(`[pixel] ${event} (não enviado: VITE_META_PIXEL_ID ausente)`);
     return;
   }
-  window.fbq('track', event, params, opts.eventID ? { eventID: opts.eventID } : undefined);
+  const eventID = opts.eventID ?? `${event}.${generateId()}`;
+  window.fbq('track', event, params, { eventID });
+  void sendCapiEvent(event, eventID, params, opts.user);
 }

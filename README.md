@@ -66,7 +66,18 @@ Se o endpoint não estiver configurado ou falhar, o quiz continua até o WhatsAp
 | `Lead` | Só depois de o CRM responder 2xx (1x por lead, `eventID = lead_id` para deduplicar com a CAPI) |
 | `Contact` | No clique do botão de WhatsApp (1x por lead) |
 
-Nenhum dado pessoal vai nos eventos. Os parâmetros enviados são apenas `content_name`, `content_category` e `lead_quality`.
+Pixel ID: `1014610764961858` (padrão em `src/config/env.ts`).
+
+Nenhum dado pessoal vai nos parâmetros dos eventos (apenas `content_name`, `content_category` e `lead_quality`).
+
+### API de Conversões (CAPI)
+
+Todo evento acima também é enviado pelo servidor, com o **mesmo `event_id`** do Pixel para a Meta deduplicar. O navegador posta em `/api/meta-capi` e o Caddy (ou o proxy do Vite em dev) repassa à Graph API acrescentando o token, que **nunca vai ao navegador nem ao Git**.
+
+- **Produção:** defina `META_CAPI_TOKEN` nas variáveis de ambiente do serviço no Easypanel. Sem ela, a CAPI falha e só o Pixel funciona.
+- **Local:** coloque `META_CAPI_TOKEN=...` no `.env` (ignorado pelo Git).
+- `user_data`: user agent, cookies `_fbp`/`_fbc` e `external_id` (id do lead) em todos os eventos. Em `Lead` e `Contact` vão também telefone, nome, sobrenome, cidade, UF e país, normalizados e com hash SHA-256.
+- Para testar no Gerenciador de Eventos, veja a aba "Eventos de teste" / "Visão geral" do pixel: os eventos do servidor aparecem como "Servidor" e os do navegador como "Navegador".
 
 ## Observações
 

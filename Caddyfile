@@ -25,6 +25,25 @@
 		}
 	}
 
+	# Meta API de Conversões: o navegador posta os eventos aqui e o Caddy repassa à Graph API
+	# acrescentando o token. Defina META_CAPI_TOKEN no Easypanel — o token nunca vai ao navegador.
+	@metaCapi {
+		method POST
+		path /api/meta-capi
+	}
+	handle @metaCapi {
+		request_body {
+			max_size 32KB
+		}
+		rewrite * /v25.0/{$META_PIXEL_ID:1014610764961858}/events?access_token={$META_CAPI_TOKEN}
+		reverse_proxy https://graph.facebook.com {
+			header_up Host {upstream_hostport}
+			header_up -Origin
+			header_up -Referer
+			header_up -Cookie
+		}
+	}
+
 	handle {
 		root * {$SITE_ROOT:/app/dist}
 
