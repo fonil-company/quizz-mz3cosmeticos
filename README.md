@@ -66,7 +66,7 @@ Se o endpoint não estiver configurado ou falhar, o quiz continua até o WhatsAp
 | `Lead` | Só depois de o **CRM Fonil** confirmar o recebimento (HTTP 2xx). O webhook do estado não conta. 1x por lead, `eventID = lead_id` para deduplicar com a CAPI. Se o CRM falhar, a pessoa pode voltar e reenviar: o site tenta de novo só o CRM e, se confirmar, dispara o Lead. |
 | `Contact` | No clique do botão de WhatsApp (1x por lead) |
 
-Pixel ID: `1014610764961858`. O código base do Pixel fica **no `index.html`**, para o PageView disparar antes de o app baixar (melhor connect rate); o mesmo ID está em `src/config/env.ts` — se trocar, troque nos dois.
+Pixel ID: `4367782926817920`. O código base do Pixel fica **no `index.html`**, para o PageView disparar antes de o app baixar (melhor connect rate); o mesmo ID está em `src/config/env.ts` — se trocar, troque nos dois.
 
 Nenhum dado pessoal vai nos parâmetros dos eventos (apenas `content_name`, `content_category` e `lead_quality`).
 

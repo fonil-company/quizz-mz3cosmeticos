@@ -35,7 +35,7 @@
 		request_body {
 			max_size 32KB
 		}
-		rewrite * /v25.0/{$META_PIXEL_ID:1014610764961858}/events?access_token={$META_CAPI_TOKEN}
+		rewrite * /v25.0/{$META_PIXEL_ID:4367782926817920}/events?access_token={$META_CAPI_TOKEN}
 		reverse_proxy https://graph.facebook.com {
 			header_up Host {upstream_hostport}
 			header_up -Origin

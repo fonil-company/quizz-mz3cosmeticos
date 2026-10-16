@@ -41,7 +41,7 @@ export function crmEndpointFor(uf: string): string {
 export const FONIL_CRM_PATH: string = (import.meta.env.VITE_FONIL_CRM_PATH ?? '').trim() || '/api/crm-lead';
 
 /** ID do Meta Pixel (público). Pode ser sobrescrito via VITE_META_PIXEL_ID. */
-export const META_PIXEL_ID: string = (import.meta.env.VITE_META_PIXEL_ID ?? '').trim() || '1014610764961858';
+export const META_PIXEL_ID: string = (import.meta.env.VITE_META_PIXEL_ID ?? '').trim() || '4367782926817920';
 
 /**
  * Meta API de Conversões: rota no mesmo domínio que o servidor (Caddyfile / vite.config.ts)

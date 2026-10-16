@@ -6,7 +6,7 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   const crmToken = env.FONIL_CRM_TOKEN || 'cmpsco6tj00036wt3kna7cp5b';
-  const pixelId = env.META_PIXEL_ID || env.VITE_META_PIXEL_ID || '1014610764961858';
+  const pixelId = env.META_PIXEL_ID || env.VITE_META_PIXEL_ID || '4367782926817920';
   const capiToken = env.META_CAPI_TOKEN ?? '';
   const proxy = {
     '/api/crm-lead': {
