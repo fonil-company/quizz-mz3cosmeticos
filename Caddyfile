@@ -16,7 +16,7 @@
 		path /api/crm-lead
 	}
 	handle @crmLead {
-		rewrite * /api/webhooks/leads/{$FONIL_CRM_TOKEN:cmpsco6tj00036wt3kna7cp5b}
+		rewrite * /api/webhooks/leads/{$FONIL_CRM_TOKEN:cmuyevzib001hlf3j111omsuv}
 		reverse_proxy https://crm.fonilgroup.com.br {
 			header_up Host {upstream_hostport}
 			header_up -Origin

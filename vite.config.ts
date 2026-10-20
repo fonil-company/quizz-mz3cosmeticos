@@ -5,7 +5,7 @@ import tailwindcss from '@tailwindcss/vite';
 /** Mesmos repasses do Caddyfile, para `npm run dev` / `npm run preview` (CRM Fonil e Meta CAPI). */
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
-  const crmToken = env.FONIL_CRM_TOKEN || 'cmpsco6tj00036wt3kna7cp5b';
+  const crmToken = env.FONIL_CRM_TOKEN || 'cmuyevzib001hlf3j111omsuv';
   const pixelId = env.META_PIXEL_ID || env.VITE_META_PIXEL_ID || '4367782926817920';
   const capiToken = env.META_CAPI_TOKEN ?? '';
   const proxy = {
