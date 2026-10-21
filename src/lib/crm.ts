@@ -11,7 +11,7 @@
  * Só retorna `ok` quando ao menos um destino responde 2xx — nunca simula sucesso.
  * `crmOk` indica a confirmação do CRM Fonil, que é o que libera o evento Lead do Pixel/CAPI.
  */
-import { CRM_ENDPOINTS, FONIL_CRM_PATH, crmEndpointFor } from '../config/env';
+import { CRM_ENDPOINTS, FONIL_CONSULTANTS, FONIL_CRM_PATH, FONIL_PIPELINE_STAGE, crmEndpointFor } from '../config/env';
 import type { SubmissionStatus } from '../types';
 import type { LeadPayload } from './lead';
 
@@ -29,18 +29,30 @@ const inFlight = new Map<string, Promise<LeadSubmitResult>>();
 export interface FonilCrmPayload {
   phone: string;
   name: string;
+  email?: string;
   document?: string;
   city?: string;
   state?: string;
+  pipeline_stage?: string;
+  consultant?: string;
 }
 
 export function buildFonilPayload(p: LeadPayload): FonilCrmPayload {
+  const phone = p.contact.whatsapp.replace(/\D/g, '');
+  const email = p.contact.email?.trim();
+  const uf = p.location.uf.trim().toUpperCase();
+  const city = p.location.city.trim();
+  const consultant = uf === 'PI' || uf === 'MA' ? FONIL_CONSULTANTS[uf] : undefined;
   return {
-    phone: p.contact.whatsapp.replace(/^55/, ''), // DDD + número, como no exemplo do CRM
-    name: p.contact.name,
+    // Remove apenas o DDI; um telefone nacional com DDD 55 deve ser preservado.
+    phone: /^55\d{10,11}$/.test(phone) ? phone.slice(2) : phone,
+    name: p.contact.name.trim(),
+    ...(email && { email }),
     ...(p.contact.cnpj && { document: p.contact.cnpj }),
-    ...(p.location.city && { city: p.location.city }),
-    ...(p.location.uf && { state: p.location.uf }),
+    ...(city && { city }),
+    ...(uf && { state: uf }),
+    ...(FONIL_PIPELINE_STAGE && { pipeline_stage: FONIL_PIPELINE_STAGE }),
+    ...(consultant && { consultant }),
   };
 }
 

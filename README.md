@@ -18,6 +18,9 @@ npm run build          # gera /dist (site estático)
 | `VITE_WHATSAPP_NUMBER_PI` / `VITE_WHATSAPP_NUMBER_MA` | Opcional. Sobrescreve o WhatsApp de cada estado. Padrão em `src/config/env.ts` (`WHATSAPP_NUMBERS`): **Piauí → 5586993271298**, **Maranhão → 5586995319157**. Ao final, o lead é direcionado ao número do estado que marcou. |
 | `VITE_CRM_ENDPOINT_PI` / `VITE_CRM_ENDPOINT_MA` | Opcionais. Sobrescrevem os webhooks por estado. Os webhooks fornecidos já estão configurados em `src/config/env.ts`: **Piauí → Henrique**, **Maranhão → Francisca**. |
 | `VITE_CRM_ENDPOINT` | Backend/proxy genérico, usado apenas como fallback para UFs sem webhook estadual. Não substitui os destinos de PI/MA. |
+| `FONIL_CRM_TOKEN` | Token do webhook Fonil, lido somente pelo servidor. |
+| `VITE_FONIL_PIPELINE_STAGE` | Etapa enviada em `pipeline_stage`, por exemplo `Qualificado`. Vazio omite o campo e preserva o padrão do CRM. |
+| `VITE_FONIL_CONSULTANT_PI` / `VITE_FONIL_CONSULTANT_MA` | Nomes dos consultores no CRM. Padrão: Henrique (PI) e Francisca (MA). |
 | `VITE_META_PIXEL_ID` | ID do Pixel. Vazio = eventos desligados. |
 
 Em `npm run dev`, um botão amarelo no canto superior direito mostra o que falta configurar e se o lead foi realmente salvo. Ele não aparece no build de produção.
@@ -37,7 +40,9 @@ O envio acontece **no final do quiz**, após validar os dados de contato e o con
 1. **Webhook do estado** (payload completo abaixo):
    - **Piauí (`PI`) → webhook do Henrique.**
    - **Maranhão (`MA`) → webhook da Francisca.**
-2. **CRM Fonil** (`crm.fonilgroup.com.br`), no formato `{ phone, name, document, city, state }`. O webhook do CRM não libera CORS, então o navegador posta em `/api/crm-lead` (mesmo domínio) e o servidor repassa: o `Caddyfile` em produção e o proxy do `vite.config.ts` em `npm run dev`/`preview`. O token fica no servidor; para trocá-lo, defina `FONIL_CRM_TOKEN` nas variáveis de ambiente do Easypanel (e no `.env` local).
+2. **CRM Fonil** (`crm.fonilgroup.com.br`), no formato `{ phone, name, email?, document?, city?, state?, pipeline_stage?, consultant? }`. O webhook do CRM não libera CORS, então o navegador posta em `/api/crm-lead` (mesmo domínio) e o servidor repassa para `POST /api/webhooks/leads/{token}`: o `Caddyfile` em produção e o proxy do `vite.config.ts` em `npm run dev`/`preview`. O token fica no servidor; para trocá-lo, defina `FONIL_CRM_TOKEN` nas variáveis de ambiente do Easypanel (e no `.env` local).
+
+O JSON do Fonil usa os nomes canônicos do contrato, com `phone` (DDD + número, somente dígitos) e `name` obrigatórios. O CNPJ segue em `document` quando preenchido. `consultant` segue o estado: Henrique para PI e Francisca para MA. `pipeline_stage` só é enviado quando configurado. O formulário atual não coleta e-mail; o adaptador aceita `contact.email` quando disponível e omite o campo quando vazio. Não são enviados valores fictícios para campos opcionais.
 
 O lead conta como salvo quando ao menos um destino responde 2xx, mas o evento `Lead` do Pixel/CAPI depende só da confirmação do CRM Fonil.
 

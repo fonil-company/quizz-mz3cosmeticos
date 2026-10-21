@@ -20,6 +20,7 @@ export interface LeadPayload {
   submitted_at_local: string;
   contact: {
     name: string;
+    email?: string;
     business_name: string;
     whatsapp: string;
     whatsapp_formatted: string;

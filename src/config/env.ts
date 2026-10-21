@@ -40,6 +40,15 @@ export function crmEndpointFor(uf: string): string {
  */
 export const FONIL_CRM_PATH: string = (import.meta.env.VITE_FONIL_CRM_PATH ?? '').trim() || '/api/crm-lead';
 
+/** Vazio preserva a etapa padrão configurada no CRM. */
+export const FONIL_PIPELINE_STAGE = (import.meta.env.VITE_FONIL_PIPELINE_STAGE ?? '').trim();
+
+/** Mesmo encaminhamento comercial dos webhooks estaduais. */
+export const FONIL_CONSULTANTS: Record<'PI' | 'MA', string> = {
+  PI: (import.meta.env.VITE_FONIL_CONSULTANT_PI ?? '').trim() || 'Henrique',
+  MA: (import.meta.env.VITE_FONIL_CONSULTANT_MA ?? '').trim() || 'Francisca',
+};
+
 /** ID do Meta Pixel (público). Pode ser sobrescrito via VITE_META_PIXEL_ID. */
 export const META_PIXEL_ID: string = (import.meta.env.VITE_META_PIXEL_ID ?? '').trim() || '4367782926817920';
 
