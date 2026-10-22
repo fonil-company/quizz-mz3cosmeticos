@@ -201,6 +201,7 @@ export const CONTACT_COPY = {
     name: { label: 'Nome completo', placeholder: 'Seu nome e sobrenome' },
     business: { label: 'Nome do estabelecimento', placeholder: 'Ex.: Perfumaria Central' },
     whatsapp: { label: 'WhatsApp com DDD', placeholder: '(86) 99999-9999' },
+    email: { label: 'E-mail', placeholder: 'voce@exemplo.com', hint: 'Opcional' },
     cnpj: { label: 'CNPJ', placeholder: '00.000.000/0000-00', hint: 'Opcional' },
   },
   consent:
@@ -223,4 +224,4 @@ export const SUCCESS_COPY = {
 };
 
 export const WHATSAPP_INTRO =
-  'Olá! Preenchi o quiz da MZ3 Cosméticos e gostaria de conhecer a linha Keratex e as condições comerciais para revenda.';
+  'Olá! Acabei de responder o diagnóstico e gostaria de um mix de pedidos!';

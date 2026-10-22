@@ -29,7 +29,7 @@ function freshState(): QuizState {
     direction: 1,
     answers: {},
     location: { state: null, uf: '', city: '' },
-    contact: { name: '', business: '', whatsapp: '', cnpj: '', consent: false },
+    contact: { name: '', business: '', whatsapp: '', email: '', cnpj: '', consent: false },
     leadId: generateId(),
     startedAt: new Date().toISOString(),
     submission: { status: 'idle' },
@@ -96,6 +96,7 @@ function loadInitialState(): QuizState {
   const restored: QuizState = {
     ...freshState(),
     ...stored,
+    contact: { ...freshState().contact, ...stored.contact },
     direction: 1,
     submission:
       stored.submission?.status === 'sending' ? { ...stored.submission, status: 'idle' } : stored.submission,

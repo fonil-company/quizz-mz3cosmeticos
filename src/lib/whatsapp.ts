@@ -1,21 +1,18 @@
 import { WHATSAPP_NUMBERS } from '../config/env';
-import { QUESTIONS, WHATSAPP_INTRO } from '../config/quiz';
+import { WHATSAPP_INTRO } from '../config/quiz';
 import type { QuizState } from '../types';
-import { cityUf, optionLabel } from './answers';
+import { maskCnpj, maskPhone } from './validation';
 
 export function buildWhatsAppMessage(state: QuizState): string {
-  const { answers, contact, location } = state;
+  const { contact, location } = state;
   const lines = [
     WHATSAPP_INTRO,
     '',
+    `CNPJ: ${maskCnpj(contact.cnpj) || 'Não informado'}`,
     `Nome: ${contact.name.trim()}`,
-    `Empresa: ${contact.business.trim()}`,
-    `Cidade/UF: ${cityUf(location)}`,
-    `${QUESTIONS.establishment.summaryLabel}: ${optionLabel('establishment', answers.establishment)}`,
-    `${QUESTIONS.resale.summaryLabel}: ${optionLabel('resale', answers.resale)}`,
-    `${QUESTIONS.budget.summaryLabel}: ${optionLabel('budget', answers.budget)}`,
-    `${QUESTIONS.relationship.summaryLabel}: ${optionLabel('relationship', answers.relationship)}`,
-    `${QUESTIONS.timing.summaryLabel}: ${optionLabel('timing', answers.timing)}`,
+    `WhatsApp: ${maskPhone(contact.whatsapp)}`,
+    `E-mail: ${contact.email?.trim() || 'Não informado'}`,
+    `Estado: ${location.uf}`,
   ];
   return lines.join('\n');
 }

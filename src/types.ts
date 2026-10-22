@@ -13,6 +13,7 @@ export interface ContactData {
   name: string;
   business: string;
   whatsapp: string;
+  email: string;
   cnpj: string;
   consent: boolean;
 }

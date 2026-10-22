@@ -1,5 +1,5 @@
 import { m } from 'framer-motion';
-import { AlertCircle, ArrowRight, Check, FileText, Loader2, Lock, MapPin, Phone, Store, User } from 'lucide-react';
+import { AlertCircle, ArrowRight, Check, FileText, Loader2, Lock, Mail, MapPin, Phone, Store, User } from 'lucide-react';
 import { useId, useRef, useState, type FormEvent } from 'react';
 import { CONTACT_COPY as C } from '../config/quiz';
 import {
@@ -7,6 +7,7 @@ import {
   maskPhone,
   validateBusiness,
   validateCnpj,
+  validateEmail,
   validateFullName,
   validatePhone,
 } from '../lib/validation';
@@ -15,7 +16,7 @@ import { FormField } from './FormField';
 import { PrimaryButton } from './PrimaryButton';
 import { StepHeading } from './StepHeading';
 
-type FieldKey = 'name' | 'business' | 'whatsapp' | 'cnpj' | 'consent';
+type FieldKey = 'name' | 'business' | 'whatsapp' | 'email' | 'cnpj' | 'consent';
 
 interface ContactFormProps {
   value: ContactData;
@@ -31,12 +32,13 @@ function validateAll(v: ContactData): Record<FieldKey, string | null> {
     name: validateFullName(v.name),
     business: validateBusiness(v.business),
     whatsapp: validatePhone(v.whatsapp),
+    email: validateEmail(v.email),
     cnpj: validateCnpj(v.cnpj),
     consent: v.consent ? null : 'Para continuar, autorize o contato comercial.',
   };
 }
 
-const ORDER: FieldKey[] = ['name', 'business', 'whatsapp', 'cnpj', 'consent'];
+const ORDER: FieldKey[] = ['name', 'business', 'whatsapp', 'email', 'cnpj', 'consent'];
 
 export function ContactForm({ value, cityUf, sending, onChange, onSubmit, onEditLocation }: ContactFormProps) {
   const [touched, setTouched] = useState<Partial<Record<FieldKey, boolean>>>({});
@@ -45,6 +47,7 @@ export function ContactForm({ value, cityUf, sending, onChange, onSubmit, onEdit
     name: useRef<HTMLInputElement>(null),
     business: useRef<HTMLInputElement>(null),
     whatsapp: useRef<HTMLInputElement>(null),
+    email: useRef<HTMLInputElement>(null),
     cnpj: useRef<HTMLInputElement>(null),
     consent: useRef<HTMLInputElement>(null),
   };
@@ -137,6 +140,24 @@ export function ContactForm({ value, cityUf, sending, onChange, onSubmit, onEdit
           error={shown('whatsapp')}
           valid={!errors.whatsapp}
           required
+        />
+        <FormField
+          ref={refs.email}
+          label={C.fields.email.label}
+          hint={C.fields.email.hint}
+          placeholder={C.fields.email.placeholder}
+          icon={Mail}
+          name="email"
+          type="email"
+          autoComplete="email"
+          autoCapitalize="none"
+          spellCheck={false}
+          maxLength={254}
+          value={value.email}
+          onChange={(e) => onChange({ email: e.target.value })}
+          onBlur={touch('email')}
+          error={shown('email')}
+          valid={!!value.email && !errors.email}
         />
         <FormField
           ref={refs.cnpj}

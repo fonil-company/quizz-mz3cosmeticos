@@ -3,6 +3,9 @@
 # Não o adicione também em `setup`: os snapshots Nix usam versões diferentes
 # e geram conflito de arquivos (caddy-api.service) ao montar o ambiente.
 
+[phases.setup]
+nixPkgs = ["nodejs_22"]
+
 [phases.install]
 cmds = ["npm ci"]
 

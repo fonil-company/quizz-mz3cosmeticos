@@ -70,6 +70,7 @@ export function buildLeadPayload(state: QuizState, now = new Date()): LeadPayloa
     }).format(now),
     contact: {
       name: contact.name.trim().replace(/\s+/g, ' '),
+      ...(contact.email?.trim() && { email: contact.email.trim() }),
       business_name: contact.business.trim(),
       whatsapp: `55${phone}`,
       whatsapp_formatted: maskPhone(phone),

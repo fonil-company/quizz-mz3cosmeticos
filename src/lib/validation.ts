@@ -72,6 +72,12 @@ export function validateCnpj(value: string): string | null {
 
 /* ---------------- Textos ---------------- */
 
+export function validateEmail(value: string): string | null {
+  const email = value.trim();
+  if (!email) return null;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? null : 'Informe um e-mail válido ou deixe em branco.';
+}
+
 const NAME_CHARS = /^[\p{L}' .-]+$/u;
 
 export function validateFullName(value: string): string | null {
