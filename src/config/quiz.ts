@@ -224,4 +224,4 @@ export const SUCCESS_COPY = {
 };
 
 export const WHATSAPP_INTRO =
-  'Olá! Acabei de responder o diagnóstico e gostaria de um mix de pedidos!';
+  'Olá! Acabei de responder o diagnóstico dos produtos MZ3 gostaria de ver o mix de produtos de vocês!';
