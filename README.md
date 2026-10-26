@@ -21,6 +21,7 @@ npm run build          # gera /dist (site estático)
 | `FONIL_CRM_TOKEN` | Token do webhook Fonil, lido somente pelo servidor. |
 | `VITE_FONIL_PIPELINE_STAGE` | Etapa enviada em `pipeline_stage`, por exemplo `Qualificado`. Vazio omite o campo e preserva o padrão do CRM. |
 | `VITE_FONIL_CONSULTANT_PI` / `VITE_FONIL_CONSULTANT_MA` | Nomes dos consultores no CRM. Padrão: Henrique (PI) e Francisca (MA). |
+| `VITE_FONIL_NOTES_FIELD` | Chave que leva as respostas do quiz para Observações no Fonil. Padrão: `notes`. |
 | `VITE_META_PIXEL_ID` | ID do Pixel. Vazio = eventos desligados. |
 
 Em `npm run dev`, um botão amarelo no canto superior direito mostra o que falta configurar e se o lead foi realmente salvo. Ele não aparece no build de produção.
@@ -40,13 +41,15 @@ O envio acontece **no final do quiz**, após validar os dados de contato e o con
 1. **Webhook do estado** (payload completo abaixo):
    - **Piauí (`PI`) → webhook do Henrique.**
    - **Maranhão (`MA`) → webhook da Francisca.**
-2. **CRM Fonil** (`crm.fonilgroup.com.br`), no formato `{ phone, name, email?, document?, city?, state?, pipeline_stage?, consultant? }`. O webhook do CRM não libera CORS, então o navegador posta em `/api/crm-lead` (mesmo domínio) e o servidor repassa para `POST /api/webhooks/leads/{token}`: o `Caddyfile` em produção e o proxy do `vite.config.ts` em `npm run dev`/`preview`. O token fica no servidor; para trocá-lo, defina `FONIL_CRM_TOKEN` nas variáveis de ambiente do Easypanel (e no `.env` local).
+2. **CRM Fonil** (`crm.fonilgroup.com.br`), no formato `{ phone, name, email?, document?, city?, state?, pipeline_stage?, consultant?, notes }`. O webhook do CRM não libera CORS, então o navegador posta em `/api/crm-lead` (mesmo domínio) e o servidor repassa para `POST /api/webhooks/leads/{token}`: o `Caddyfile` em produção e o proxy do `vite.config.ts` em `npm run dev`/`preview`. O token fica no servidor; para trocá-lo, defina `FONIL_CRM_TOKEN` nas variáveis de ambiente do Easypanel (e no `.env` local).
 
 O JSON do Fonil usa os nomes canônicos do contrato, com `phone` (DDD + número, somente dígitos) e `name` obrigatórios. O CNPJ segue em `document` sem máscara quando preenchido, preservando zeros iniciais e as letras dos CNPJs alfanuméricos já aceitos pelo formulário. `consultant` segue o estado: Henrique para PI e Francisca para MA. `pipeline_stage` só é enviado quando configurado. O formulário coleta e-mail opcional e omite o campo quando vazio. Não são enviados valores fictícios para campos opcionais.
 
 A URL de entrada completa (query string e fragmento) segue em `event_source_url`. Todos os `utm_*` e os identificadores `fbclid`, `gclid`, `gbraid`, `wbraid`, `msclkid`, `ttclid`, `campaign`, `campaign_id`, `adset_id`, `ad_id` e `placement` são capturados sem truncamento. Macros de anúncio não resolvidas e valores vazios são omitidos. A atribuição fica na sessão; uma nova campanha explícita substitui a anterior sem misturar cliques. Cookies `_fbc` e `_fbp` são lidos no envio e mapeados exclusivamente para `fbc` e `fbp` no Fonil.
 
-O adaptador Fonil não envia `page_url`, `landing_url`, `landing_page`, `referrer`, `_fbc`, `_fbp`, `event_id`, nem objetos internos de qualificação/contato. O destino estadual continua recebendo o payload interno completo. O contrato fornecido e a integração existente não definem uma chave para Observações: até sua confirmação, as respostas continuam no webhook estadual e no WhatsApp, sem inventar um campo no Fonil ou misturar tracking às respostas.
+O adaptador Fonil não envia `page_url`, `landing_url`, `landing_page`, `referrer`, `_fbc`, `_fbp`, `event_id`, nem objetos internos de qualificação/contato. O destino estadual continua recebendo o payload interno completo.
+
+**Observações (quiz):** as respostas efetivamente dadas seguem em `notes`, uma pergunta por bloco na ordem das telas (`Pergunta\nResposta: ...`, blocos separados por linha em branco). Não entram tracking, URLs nem dados de contato. A chave `notes` foi definida neste projeto, pois o contrato do CRM não documenta um campo de observações; se o CRM usar outro nome, troque em `VITE_FONIL_NOTES_FIELD`.
 
 A tela de conclusão e o evento `Lead` do Pixel/CAPI dependem da confirmação HTTP 2xx do CRM Fonil. Se o Fonil falhar, o formulário mantém os dados e mostra uma mensagem para tentar novamente. Só os destinos ainda pendentes recebem o reenvio; o `eventID` continua sendo o mesmo `lead_id`.
 

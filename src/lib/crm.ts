@@ -11,7 +11,8 @@
  * Só retorna `ok` quando ao menos um destino responde 2xx — nunca simula sucesso.
  * `crmOk` indica a confirmação do CRM Fonil, que é o que libera o evento Lead do Pixel/CAPI.
  */
-import { CRM_ENDPOINTS, FONIL_CONSULTANTS, FONIL_CRM_PATH, FONIL_PIPELINE_STAGE, crmEndpointFor } from '../config/env';
+import { CRM_ENDPOINTS, FONIL_CONSULTANTS, FONIL_CRM_PATH, FONIL_NOTES_FIELD, FONIL_PIPELINE_STAGE, crmEndpointFor } from '../config/env';
+import { LOCATION_STEP, QUESTIONS, STEP_ORDER, type ChoiceQuestionId } from '../config/quiz';
 import type { SubmissionStatus } from '../types';
 import type { LeadPayload } from './lead';
 import { isCampaignKey, isCampaignValue } from './utm';
@@ -42,6 +43,21 @@ export interface FonilCrmPayload {
   fbp?: string;
 }
 
+/** Observações do CRM: só as respostas dadas no quiz (pergunta e resposta), na ordem das telas. */
+export function buildQuizNotes(p: LeadPayload): string {
+  const blocks: string[] = [];
+  const add = (question: string, answer: string) => answer && blocks.push(`${question}\nResposta: ${answer}`);
+  for (const step of STEP_ORDER) {
+    if (step === 'location') {
+      const { state_option, city, uf } = p.location;
+      add(LOCATION_STEP.title, city && uf ? `${city}/${uf}` : state_option);
+    } else if (step in QUESTIONS) {
+      add(QUESTIONS[step as ChoiceQuestionId].title, p.answers[step as ChoiceQuestionId]?.label ?? '');
+    }
+  }
+  return blocks.join('\n\n');
+}
+
 export function buildFonilPayload(p: LeadPayload): FonilCrmPayload {
   const phone = p.contact.whatsapp.replace(/\D/g, '');
   const email = p.contact.email?.trim();
@@ -55,6 +71,7 @@ export function buildFonilPayload(p: LeadPayload): FonilCrmPayload {
     ),
   );
   const consultant = uf === 'PI' || uf === 'MA' ? FONIL_CONSULTANTS[uf] : undefined;
+  const notes = buildQuizNotes(p);
   return {
     // Remove apenas o DDI; um telefone nacional com DDD 55 deve ser preservado.
     phone: /^55\d{10,11}$/.test(phone) ? phone.slice(2) : phone,
@@ -65,6 +82,7 @@ export function buildFonilPayload(p: LeadPayload): FonilCrmPayload {
     ...(uf && { state: uf }),
     ...(FONIL_PIPELINE_STAGE && { pipeline_stage: FONIL_PIPELINE_STAGE }),
     ...(consultant && { consultant }),
+    ...(notes && { [FONIL_NOTES_FIELD]: notes }),
     ...attribution,
     event_source_url: p.tracking.event_source_url,
     ...(p.tracking.fbc && { fbc: p.tracking.fbc }),

@@ -58,7 +58,13 @@ test('captura integral, cookies tardios e payload Fonil sem aliases internos', a
   assert.equal(payload.document, '01234567000189');
   assert.equal(payload.city, 'Teresina');
   assert.equal(payload.consultant, 'Henrique');
-  for (const key of ['email', 'page_url', 'landing_url', 'landing_page', 'referrer', '_fbc', '_fbp', 'event_id', 'lead_id', 'user_agent', 'notes']) assert.ok(!(key in payload), key);
+  for (const key of ['email', 'page_url', 'landing_url', 'landing_page', 'referrer', '_fbc', '_fbp', 'event_id', 'lead_id', 'user_agent']) assert.ok(!(key in payload), key);
+  // Observações: só perguntas e respostas do quiz, na ordem das telas, sem tracking.
+  const blocks = payload.notes.split('\n\n');
+  assert.equal(blocks.length, 6);
+  assert.equal(blocks[0], 'Qual é o tipo do seu estabelecimento?\nResposta: Loja de cosméticos ou perfumaria');
+  assert.equal(blocks[1], 'Onde fica o seu estabelecimento?\nResposta: Teresina/PI');
+  for (const leak of ['utm_', 'fbclid', 'gclid', 'quiz.example', 'fb.1.', 'Nome Teste']) assert.ok(!payload.notes.includes(leak), leak);
   assert.equal(lead.tracking.referrer, 'https://referrer.example/');
   assert.ok(lead.answers.establishment.label);
   assert.equal(lead.contact.business_name, 'Loja Teste');
