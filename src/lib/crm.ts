@@ -14,6 +14,7 @@
 import { CRM_ENDPOINTS, FONIL_CONSULTANTS, FONIL_CRM_PATH, FONIL_PIPELINE_STAGE, crmEndpointFor } from '../config/env';
 import type { SubmissionStatus } from '../types';
 import type { LeadPayload } from './lead';
+import { isCampaignKey, isCampaignValue } from './utm';
 
 export type SubmitResult = { status: Extract<SubmissionStatus, 'ok' | 'not_configured' | 'failed'>; httpStatus?: number };
 export type LeadSubmitResult = SubmitResult & { stateOk: boolean; crmOk: boolean };
@@ -27,6 +28,7 @@ const inFlight = new Map<string, Promise<LeadSubmitResult>>();
 
 /** Contrato do webhook do CRM Fonil (POST /api/webhooks/leads/{token}). */
 export interface FonilCrmPayload {
+  [key: string]: string | undefined;
   phone: string;
   name: string;
   email?: string;
@@ -35,6 +37,9 @@ export interface FonilCrmPayload {
   state?: string;
   pipeline_stage?: string;
   consultant?: string;
+  event_source_url: string;
+  fbc?: string;
+  fbp?: string;
 }
 
 export function buildFonilPayload(p: LeadPayload): FonilCrmPayload {
@@ -42,17 +47,28 @@ export function buildFonilPayload(p: LeadPayload): FonilCrmPayload {
   const email = p.contact.email?.trim();
   const uf = p.location.uf.trim().toUpperCase();
   const city = p.location.city.trim();
+  // Numérico sem máscara; mantém letras de CNPJs alfanuméricos já aceitos pelo formulário.
+  const document = p.contact.cnpj?.replace(/[^a-z0-9]/gi, '').toUpperCase();
+  const attribution = Object.fromEntries(
+    Object.entries(p.tracking).filter(([key, value]) =>
+      isCampaignKey(key) && isCampaignValue(key, value),
+    ),
+  );
   const consultant = uf === 'PI' || uf === 'MA' ? FONIL_CONSULTANTS[uf] : undefined;
   return {
     // Remove apenas o DDI; um telefone nacional com DDD 55 deve ser preservado.
     phone: /^55\d{10,11}$/.test(phone) ? phone.slice(2) : phone,
     name: p.contact.name.trim(),
     ...(email && { email }),
-    ...(p.contact.cnpj && { document: p.contact.cnpj }),
+    ...(document && { document }),
     ...(city && { city }),
     ...(uf && { state: uf }),
     ...(FONIL_PIPELINE_STAGE && { pipeline_stage: FONIL_PIPELINE_STAGE }),
     ...(consultant && { consultant }),
+    ...attribution,
+    event_source_url: p.tracking.event_source_url,
+    ...(p.tracking.fbc && { fbc: p.tracking.fbc }),
+    ...(p.tracking.fbp && { fbp: p.tracking.fbp }),
   };
 }
 

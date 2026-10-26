@@ -42,9 +42,13 @@ O envio acontece **no final do quiz**, após validar os dados de contato e o con
    - **Maranhão (`MA`) → webhook da Francisca.**
 2. **CRM Fonil** (`crm.fonilgroup.com.br`), no formato `{ phone, name, email?, document?, city?, state?, pipeline_stage?, consultant? }`. O webhook do CRM não libera CORS, então o navegador posta em `/api/crm-lead` (mesmo domínio) e o servidor repassa para `POST /api/webhooks/leads/{token}`: o `Caddyfile` em produção e o proxy do `vite.config.ts` em `npm run dev`/`preview`. O token fica no servidor; para trocá-lo, defina `FONIL_CRM_TOKEN` nas variáveis de ambiente do Easypanel (e no `.env` local).
 
-O JSON do Fonil usa os nomes canônicos do contrato, com `phone` (DDD + número, somente dígitos) e `name` obrigatórios. O CNPJ segue em `document` quando preenchido. `consultant` segue o estado: Henrique para PI e Francisca para MA. `pipeline_stage` só é enviado quando configurado. O formulário atual não coleta e-mail; o adaptador aceita `contact.email` quando disponível e omite o campo quando vazio. Não são enviados valores fictícios para campos opcionais.
+O JSON do Fonil usa os nomes canônicos do contrato, com `phone` (DDD + número, somente dígitos) e `name` obrigatórios. O CNPJ segue em `document` sem máscara quando preenchido, preservando zeros iniciais e as letras dos CNPJs alfanuméricos já aceitos pelo formulário. `consultant` segue o estado: Henrique para PI e Francisca para MA. `pipeline_stage` só é enviado quando configurado. O formulário coleta e-mail opcional e omite o campo quando vazio. Não são enviados valores fictícios para campos opcionais.
 
-O lead conta como salvo quando ao menos um destino responde 2xx, mas o evento `Lead` do Pixel/CAPI depende só da confirmação do CRM Fonil.
+A URL de entrada completa (query string e fragmento) segue em `event_source_url`. Todos os `utm_*` e os identificadores `fbclid`, `gclid`, `gbraid`, `wbraid`, `msclkid`, `ttclid`, `campaign`, `campaign_id`, `adset_id`, `ad_id` e `placement` são capturados sem truncamento. Macros de anúncio não resolvidas e valores vazios são omitidos. A atribuição fica na sessão; uma nova campanha explícita substitui a anterior sem misturar cliques. Cookies `_fbc` e `_fbp` são lidos no envio e mapeados exclusivamente para `fbc` e `fbp` no Fonil.
+
+O adaptador Fonil não envia `page_url`, `landing_url`, `landing_page`, `referrer`, `_fbc`, `_fbp`, `event_id`, nem objetos internos de qualificação/contato. O destino estadual continua recebendo o payload interno completo. O contrato fornecido e a integração existente não definem uma chave para Observações: até sua confirmação, as respostas continuam no webhook estadual e no WhatsApp, sem inventar um campo no Fonil ou misturar tracking às respostas.
+
+A tela de conclusão e o evento `Lead` do Pixel/CAPI dependem da confirmação HTTP 2xx do CRM Fonil. Se o Fonil falhar, o formulário mantém os dados e mostra uma mensagem para tentar novamente. Só os destinos ainda pendentes recebem o reenvio; o `eventID` continua sendo o mesmo `lead_id`.
 
 Selecionar ou trocar o estado não dispara um cadastro incompleto. O envio usa `POST` com `Content-Type: application/json`. O `lead_id` segue no corpo; os webhooks estaduais não recebem o header `Idempotency-Key`, pois o CORS deles não o permite. O backend/proxy genérico mantém esse header quando usado.
 
@@ -52,7 +56,13 @@ O backend deve responder 2xx somente depois de gravar o lead e deve usar o `lead
 
 O payload inclui: contato (nome, empresa, WhatsApp, CNPJ ou `null`), cidade/UF, todas as respostas (id + rótulo), a qualificação (`priority`, `score`, `relationship_tag`, `tags`, `reasons`), o consentimento, as UTMs (`utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`), `fbclid`, a landing page e os horários (`started_at`, `submitted_at` em ISO e `submitted_at_local` no fuso de Fortaleza).
 
-Se o endpoint não estiver configurado ou falhar, o quiz continua até o WhatsApp, a mensagem leva os dados à equipe e a tela final **não** diz que as respostas foram registradas.
+Se o Fonil falhar, a pessoa permanece no formulário; não há conclusão nem evento Lead baseado apenas no sucesso do webhook estadual.
+
+### Verificar a integração sem cadastrar leads reais
+
+Execute `node --test tests/crm-tracking.test.mjs` e `npm run build`. Os testes verificam captura de campanha, sessão, visita orgânica, cookies tardios/bloqueados, normalização e envio HTTP pelo proxy Vite real a um receptor local. Também cobrem falha do Fonil e reenvio apenas ao destino pendente. O build de produção mantém o token fora de `dist` e usa o repasse existente do Caddy.
+
+Esses testes não validam visualmente o bloco Origem da campanha ou Observações dentro do CRM, nem confirmam que um deploy ocorreu.
 
 ## Qualificação (interna, nunca exibida)
 

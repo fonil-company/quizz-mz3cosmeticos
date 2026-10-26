@@ -78,10 +78,10 @@ function QuizFlow() {
 
       dispatch({ type: 'SUBMIT_START' });
       const result = await submitLead(payload, targets);
-      const anyConfirmed = result.status === 'ok' || !targets.state || !targets.crm;
+      const crmConfirmed = result.crmOk || !targets.crm;
       dispatch({
         type: 'SUBMIT_DONE',
-        status: anyConfirmed ? 'ok' : result.status,
+        status: crmConfirmed ? 'ok' : 'failed',
         signature,
         stateOk: result.stateOk,
         crmOk: result.crmOk,
@@ -95,8 +95,7 @@ function QuizFlow() {
           { onceKey: `Lead:${state.leadId}`, eventID: state.leadId, user: capiUser(payload) },
         );
       }
-      // O quiz segue mesmo sem CRM: a mensagem do WhatsApp leva os dados à equipe comercial.
-      next();
+      if (crmConfirmed) next();
     } finally {
       submitting.current = false;
     }
@@ -144,6 +143,7 @@ function QuizFlow() {
             value={state.contact}
             cityUf={cityUf(state.location)}
             sending={state.submission.status === 'sending'}
+            submitFailed={state.submission.status === 'failed' || state.submission.status === 'not_configured'}
             onChange={(patch) => dispatch({ type: 'SET_CONTACT', patch })}
             onSubmit={handleContactSubmit}
             onEditLocation={() => goToStep('location')}

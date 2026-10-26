@@ -3,7 +3,7 @@ import { CONTACT_COPY } from '../config/quiz';
 import type { QuizState } from '../types';
 import { locationOptionLabel, optionLabel, stateName } from './answers';
 import { qualifyLead, type LeadPriority, type RelationshipTag } from './qualification';
-import { getTracking, type TrackingData } from './utm';
+import { getMetaCookies, getTracking, type TrackingData } from './utm';
 import { maskPhone, normalizeCnpj, onlyDigits } from './validation';
 
 interface AnswerValue {
@@ -98,7 +98,7 @@ export function buildLeadPayload(state: QuizState, now = new Date()): LeadPayloa
       reasons: q.reasons,
     },
     consent: { accepted: contact.consent, text: CONTACT_COPY.consent, accepted_at: iso },
-    tracking: { ...getTracking(), user_agent: navigator.userAgent },
+    tracking: { ...getTracking(), ...getMetaCookies(), user_agent: navigator.userAgent },
   };
 }
 

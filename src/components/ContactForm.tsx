@@ -22,6 +22,7 @@ interface ContactFormProps {
   value: ContactData;
   cityUf: string;
   sending: boolean;
+  submitFailed: boolean;
   onChange: (patch: Partial<ContactData>) => void;
   onSubmit: () => void;
   onEditLocation: () => void;
@@ -40,7 +41,7 @@ function validateAll(v: ContactData): Record<FieldKey, string | null> {
 
 const ORDER: FieldKey[] = ['name', 'business', 'whatsapp', 'email', 'cnpj', 'consent'];
 
-export function ContactForm({ value, cityUf, sending, onChange, onSubmit, onEditLocation }: ContactFormProps) {
+export function ContactForm({ value, cityUf, sending, submitFailed, onChange, onSubmit, onEditLocation }: ContactFormProps) {
   const [touched, setTouched] = useState<Partial<Record<FieldKey, boolean>>>({});
   const [submitted, setSubmitted] = useState(false);
   const refs = {
@@ -216,6 +217,11 @@ export function ContactForm({ value, cityUf, sending, onChange, onSubmit, onEdit
       </fieldset>
 
       <div className="mt-6">
+        {submitFailed && (
+          <p role="alert" className="mb-3 text-sm font-medium text-red-700">
+            Não foi possível confirmar seu cadastro. Seus dados foram mantidos; tente enviar novamente.
+          </p>
+        )}
         <PrimaryButton type="submit" disabled={sending}>
           {sending ? (
             <>

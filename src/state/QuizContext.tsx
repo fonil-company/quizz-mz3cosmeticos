@@ -43,7 +43,7 @@ function isStepComplete(state: QuizState, step: StepId): boolean {
     case 'location':
       return !!state.location.state && !!state.location.uf && !validateCity(state.location.city);
     case 'contact':
-      return ['ok', 'not_configured', 'failed'].includes(state.submission.status);
+      return state.submission.status === 'ok' && !!state.submission.crmSignature;
     case 'success':
       return true;
     default:
