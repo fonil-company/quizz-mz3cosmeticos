@@ -11,7 +11,7 @@
  * Só retorna `ok` quando ao menos um destino responde 2xx — nunca simula sucesso.
  * `crmOk` indica a confirmação do CRM Fonil, que é o que libera o evento Lead do Pixel/CAPI.
  */
-import { CRM_ENDPOINTS, FONIL_CONSULTANTS, FONIL_CRM_PATH, FONIL_NOTES_FIELD, FONIL_PIPELINE_STAGE, crmEndpointFor } from '../config/env';
+import { CRM_ENDPOINTS, FONIL_CONSULTANTS, FONIL_CRM_PATH, FONIL_PIPELINE_STAGE, crmEndpointFor } from '../config/env';
 import { LOCATION_STEP, QUESTIONS, STEP_ORDER, type ChoiceQuestionId } from '../config/quiz';
 import type { SubmissionStatus } from '../types';
 import type { LeadPayload } from './lead';
@@ -43,10 +43,13 @@ export interface FonilCrmPayload {
   fbp?: string;
 }
 
-/** Observações do CRM: só as respostas dadas no quiz (pergunta e resposta), na ordem das telas. */
-export function buildQuizNotes(p: LeadPayload): string {
-  const blocks: string[] = [];
-  const add = (question: string, answer: string) => answer && blocks.push(`${question}\nResposta: ${answer}`);
+/**
+ * Observações do CRM: o Fonil lista cada campo extra como "chave: valor", então cada
+ * pergunta respondida vai como chave própria (texto da pergunta → resposta), na ordem das telas.
+ */
+export function buildQuizAnswers(p: LeadPayload): Record<string, string> {
+  const result: Record<string, string> = {};
+  const add = (question: string, answer: string) => { if (answer) result[question] = answer; };
   for (const step of STEP_ORDER) {
     if (step === 'location') {
       const { state_option, city, uf } = p.location;
@@ -55,7 +58,7 @@ export function buildQuizNotes(p: LeadPayload): string {
       add(QUESTIONS[step as ChoiceQuestionId].title, p.answers[step as ChoiceQuestionId]?.label ?? '');
     }
   }
-  return blocks.join('\n\n');
+  return result;
 }
 
 export function buildFonilPayload(p: LeadPayload): FonilCrmPayload {
@@ -71,7 +74,6 @@ export function buildFonilPayload(p: LeadPayload): FonilCrmPayload {
     ),
   );
   const consultant = uf === 'PI' || uf === 'MA' ? FONIL_CONSULTANTS[uf] : undefined;
-  const notes = buildQuizNotes(p);
   return {
     // Remove apenas o DDI; um telefone nacional com DDD 55 deve ser preservado.
     phone: /^55\d{10,11}$/.test(phone) ? phone.slice(2) : phone,
@@ -82,7 +84,7 @@ export function buildFonilPayload(p: LeadPayload): FonilCrmPayload {
     ...(uf && { state: uf }),
     ...(FONIL_PIPELINE_STAGE && { pipeline_stage: FONIL_PIPELINE_STAGE }),
     ...(consultant && { consultant }),
-    ...(notes && { [FONIL_NOTES_FIELD]: notes }),
+    ...buildQuizAnswers(p),
     ...attribution,
     event_source_url: p.tracking.event_source_url,
     ...(p.tracking.fbc && { fbc: p.tracking.fbc }),
