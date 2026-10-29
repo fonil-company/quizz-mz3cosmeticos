@@ -202,7 +202,7 @@ export const CONTACT_COPY = {
     business: { label: 'Nome do estabelecimento', placeholder: 'Ex.: Perfumaria Central' },
     whatsapp: { label: 'WhatsApp com DDD', placeholder: '(86) 99999-9999' },
     email: { label: 'E-mail', placeholder: 'voce@exemplo.com', hint: 'Opcional' },
-    cnpj: { label: 'CNPJ', placeholder: '00.000.000/0000-00', hint: 'Opcional' },
+    cnpj: { label: 'CNPJ', placeholder: '00.000.000/0000-00' },
   },
   consent:
     'Autorizo a MZ3 Cosméticos a entrar em contato comigo pelo WhatsApp e telefone informados para fins comerciais.',

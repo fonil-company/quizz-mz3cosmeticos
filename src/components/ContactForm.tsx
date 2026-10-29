@@ -163,7 +163,6 @@ export function ContactForm({ value, cityUf, sending, submitFailed, onChange, on
         <FormField
           ref={refs.cnpj}
           label={C.fields.cnpj.label}
-          hint={C.fields.cnpj.hint}
           placeholder={C.fields.cnpj.placeholder}
           icon={FileText}
           name="cnpj"
@@ -174,7 +173,8 @@ export function ContactForm({ value, cityUf, sending, submitFailed, onChange, on
           onChange={(e) => onChange({ cnpj: maskCnpj(e.target.value) })}
           onBlur={touch('cnpj')}
           error={shown('cnpj')}
-          valid={!!value.cnpj && !errors.cnpj}
+          valid={!errors.cnpj}
+          required
         />
 
         <div>

@@ -64,9 +64,9 @@ export function isValidCnpj(value: string): boolean {
 
 export function validateCnpj(value: string): string | null {
   const c = normalizeCnpj(value);
-  if (!c) return null; // opcional
-  if (c.length < 14) return 'CNPJ incompleto. Confira os 14 caracteres ou deixe em branco.';
-  if (!isValidCnpj(c)) return 'CNPJ inválido. Confira os números ou deixe em branco.';
+  if (!c) return 'Informe o CNPJ do estabelecimento.';
+  if (c.length < 14) return 'CNPJ incompleto. Confira os 14 caracteres.';
+  if (!isValidCnpj(c)) return 'CNPJ inválido. Confira os números.';
   return null;
 }
 
