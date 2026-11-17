@@ -10,6 +10,7 @@ import { WelcomeScreen } from './components/WelcomeScreen';
 import { QUESTIONS, TOTAL_STEPS, type ChoiceQuestionId } from './config/quiz';
 import { cityUf, optionLabel } from './lib/answers';
 import { submitLead } from './lib/crm';
+import { sendToUmbrella } from './lib/umbrella';
 import type { CapiUser } from './lib/capi';
 import { buildLeadPayload, leadSignature, type LeadPayload } from './lib/lead';
 import { initPixel, trackPageView, trackPixel } from './lib/pixel';
@@ -76,6 +77,8 @@ function QuizFlow() {
         return;
       }
 
+      // Umbrella CRM em paralelo, sem bloquear nem alterar o fluxo do quiz.
+      sendToUmbrella(payload, signature);
       dispatch({ type: 'SUBMIT_START' });
       const result = await submitLead(payload, targets);
       const crmConfirmed = result.crmOk || !targets.crm;

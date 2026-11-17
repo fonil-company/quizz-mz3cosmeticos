@@ -8,7 +8,7 @@ let moduleId = 0;
 async function loadApp(env = {}) {
   const result = await build({
     stdin: {
-      contents: 'export * from "./src/lib/utm"; export * from "./src/lib/crm"; export * from "./src/lib/lead";',
+      contents: 'export * from "./src/lib/utm"; export * from "./src/lib/crm"; export * from "./src/lib/lead"; export * from "./src/lib/umbrella";',
       resolveDir: process.cwd(), loader: 'ts',
     },
     bundle: true, write: false, format: 'esm', platform: 'browser',
@@ -161,4 +161,36 @@ test('POST final atravessa o proxy até um receptor local; falha e reenvio prese
     receiver.closeAllConnections();
     await new Promise((resolve) => receiver.close(resolve));
   }
+});
+
+test('Umbrella recebe o lead uma vez, sem disparar um segundo Lead no Pixel', async () => {
+  browser('https://quiz.example/?utm_source=meta');
+  const app = await loadApp();
+  app.captureTracking();
+  const pixelCalls = [];
+  const sent = [];
+  const fbq = (...args) => pixelCalls.push(args);
+  window.fbq = fbq;
+  // Imita o script real: o submit chama fbq('track', 'Lead') se ele existir.
+  window.UmbrellaTrack = { submit: (data) => { if (typeof window.fbq === 'function') window.fbq('track', 'Lead'); sent.push(data); } };
+  const q = quiz();
+  q.contact.email = ' teste@loja.com ';
+  const lead = app.buildLeadPayload(q);
+  assert.equal(app.sendToUmbrella(lead, 'sig-1'), true);
+  assert.equal(app.sendToUmbrella(lead, 'sig-1'), false);
+  assert.equal(sent.length, 1);
+  assert.equal(pixelCalls.length, 0);
+  assert.equal(window.fbq, fbq);
+  assert.equal(sent[0].name, 'Nome Teste');
+  assert.equal(sent[0].whatsapp, '86998765432');
+  assert.equal(sent[0].state, 'PI');
+  assert.equal(sent[0].city, 'Teresina');
+  assert.equal(sent[0].landingUrl, 'https://quiz.example/?utm_source=meta');
+  assert.equal(sent[0].email, 'teste@loja.com');
+  assert.equal(sent[0].company, 'Loja Teste');
+  assert.ok(Object.keys(sent[0]).length > 10, 'respostas do quiz incluídas');
+  assert.equal(app.sendToUmbrella(lead, 'sig-2'), true);
+  assert.equal(sent.length, 2);
+  delete window.UmbrellaTrack;
+  assert.equal(app.sendToUmbrella(lead, 'sig-3'), false);
 });
