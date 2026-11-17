@@ -12,6 +12,7 @@ interface ImportMetaEnv {
   readonly VITE_FONIL_CONSULTANT_MA?: string;
   readonly VITE_META_PIXEL_ID?: string;
   readonly VITE_META_CAPI_PATH?: string;
+  readonly VITE_UMBRELLA_ENDPOINT?: string;
 }
 
 interface ImportMeta {

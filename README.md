@@ -35,12 +35,13 @@ Em `npm run dev`, um botão amarelo no canto superior direito mostra o que falta
 
 ## Integração com o CRM
 
-O envio acontece **no final do quiz**, após validar os dados de contato e o consentimento. Cada lead vai, em paralelo, para dois destinos:
+O envio acontece **no final do quiz**, após validar os dados de contato e o consentimento. Cada lead vai, em paralelo, para três destinos:
 
 1. **Webhook do estado** (payload completo abaixo):
    - **Piauí (`PI`) → webhook do Henrique.**
    - **Maranhão (`MA`) → webhook da Francisca.**
 2. **CRM Fonil** (`crm.fonilgroup.com.br`), no formato `{ phone, name, email?, document?, city?, state?, pipeline_stage?, consultant? }` + uma chave por pergunta do quiz. O webhook do CRM não libera CORS, então o navegador posta em `/api/crm-lead` (mesmo domínio) e o servidor repassa para `POST /api/webhooks/leads/{token}`: o `Caddyfile` em produção e o proxy do `vite.config.ts` em `npm run dev`/`preview`. O token fica no servidor; para trocá-lo, defina `FONIL_CRM_TOKEN` nas variáveis de ambiente do Easypanel (e no `.env` local).
+3. **CRM Umbrella** (regra de entrada "Quizes - MZ3 - V.2"), via `POST` direto do navegador com `keepalive` para `VITE_UMBRELLA_ENDPOINT` (padrão: o webhook `61d08466…`; use `off` para desativar). O Umbrella valida a origem: os domínios da página precisam estar em *Segurança → Origens permitidas*. Campos: `name`, `whatsapp` (DDD + número), `email`/`company` quando houver, `document` (CNPJ, ativa a consulta na Receita), cidade/UF, uma chave por pergunta, `source`, `lead_id` e atribuição (`utm_*`, IDs de clique e anúncio, `_fbc`, `_fbp`, `landingUrl`). Não usamos `UmbrellaTrack.submit` do script do `index.html`: ele envia por `sendBeacon` (com cookies, que o webhook não aceita) e dispara um `Lead` extra no Pixel. Falhas do Umbrella não bloqueiam o quiz.
 
 O JSON do Fonil usa os nomes canônicos do contrato, com `phone` (DDD + número, somente dígitos) e `name` obrigatórios. O CNPJ segue em `document` sem máscara quando preenchido, preservando zeros iniciais e as letras dos CNPJs alfanuméricos já aceitos pelo formulário. `consultant` segue o estado: Henrique para PI e Francisca para MA. `pipeline_stage` só é enviado quando configurado. O formulário coleta e-mail opcional e omite o campo quando vazio. Não são enviados valores fictícios para campos opcionais.
 

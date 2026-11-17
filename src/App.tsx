@@ -78,7 +78,7 @@ function QuizFlow() {
       }
 
       // Umbrella CRM em paralelo, sem bloquear nem alterar o fluxo do quiz.
-      sendToUmbrella(payload, signature);
+      void sendToUmbrella(payload, signature);
       dispatch({ type: 'SUBMIT_START' });
       const result = await submitLead(payload, targets);
       const crmConfirmed = result.crmOk || !targets.crm;

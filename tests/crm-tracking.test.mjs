@@ -163,34 +163,72 @@ test('POST final atravessa o proxy até um receptor local; falha e reenvio prese
   }
 });
 
-test('Umbrella recebe o lead uma vez, sem disparar um segundo Lead no Pixel', async () => {
-  browser('https://quiz.example/?utm_source=meta');
+test('Umbrella: POST direto com keepalive, uma vez por conjunto de dados e sem Lead extra no Pixel', async () => {
+  const url = 'https://quiz.example/?utm_source=meta&utm_campaign=c1&fbclid=abc&campaign_id=111&ad_id={{ad.id}}';
+  browser(url);
   const app = await loadApp();
   app.captureTracking();
+  document.cookie = '_fbc=fb.1.1.abc; _fbp=fb.1.1.browser';
   const pixelCalls = [];
-  const sent = [];
-  const fbq = (...args) => pixelCalls.push(args);
-  window.fbq = fbq;
-  // Imita o script real: o submit chama fbq('track', 'Lead') se ele existir.
-  window.UmbrellaTrack = { submit: (data) => { if (typeof window.fbq === 'function') window.fbq('track', 'Lead'); sent.push(data); } };
-  const q = quiz();
-  q.contact.email = ' teste@loja.com ';
-  const lead = app.buildLeadPayload(q);
-  assert.equal(app.sendToUmbrella(lead, 'sig-1'), true);
-  assert.equal(app.sendToUmbrella(lead, 'sig-1'), false);
-  assert.equal(sent.length, 1);
-  assert.equal(pixelCalls.length, 0);
-  assert.equal(window.fbq, fbq);
-  assert.equal(sent[0].name, 'Nome Teste');
-  assert.equal(sent[0].whatsapp, '86998765432');
-  assert.equal(sent[0].state, 'PI');
-  assert.equal(sent[0].city, 'Teresina');
-  assert.equal(sent[0].landingUrl, 'https://quiz.example/?utm_source=meta');
-  assert.equal(sent[0].email, 'teste@loja.com');
-  assert.equal(sent[0].company, 'Loja Teste');
-  assert.ok(Object.keys(sent[0]).length > 10, 'respostas do quiz incluídas');
-  assert.equal(app.sendToUmbrella(lead, 'sig-2'), true);
-  assert.equal(sent.length, 2);
-  delete window.UmbrellaTrack;
-  assert.equal(app.sendToUmbrella(lead, 'sig-3'), false);
+  window.fbq = (...args) => pixelCalls.push(args);
+  const calls = [];
+  let status = 500;
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (endpoint, init) => { calls.push({ endpoint, init }); return { ok: status < 300, status }; };
+  try {
+    const q = quiz();
+    q.contact.email = ' teste@loja.com ';
+    const lead = app.buildLeadPayload(q);
+
+    assert.equal(await app.sendToUmbrella(lead, 'sig-1'), false, 'falha não marca como enviado');
+    status = 202;
+    assert.equal(await app.sendToUmbrella(lead, 'sig-1'), true, 'reenvia após falha');
+    assert.equal(await app.sendToUmbrella(lead, 'sig-1'), false, 'não duplica os mesmos dados');
+    assert.equal(calls.length, 2);
+    assert.equal(pixelCalls.length, 0);
+
+    const { endpoint, init } = calls[1];
+    assert.equal(endpoint, 'https://crm-api.umbrellaecosystem.com.br/api/v1/webhooks/in/61d08466-bfeb-4093-9dfd-f24822aa26a6');
+    assert.equal(init.method, 'POST');
+    assert.equal(init.keepalive, true);
+    assert.equal(init.credentials, undefined, 'sem cookies: o webhook não libera credenciais');
+    const body = JSON.parse(init.body);
+    assert.equal(body.name, 'Nome Teste');
+    assert.equal(body.whatsapp, '86998765432');
+    assert.equal(body.document, '01234567000189');
+    assert.equal(body.cnpj, undefined);
+    assert.equal(body.city, 'Teresina');
+    assert.equal(body.state, 'PI');
+    assert.equal(body.email, 'teste@loja.com');
+    assert.equal(body.company, 'Loja Teste');
+    assert.equal(body.lead_id, 'mock-lead');
+    assert.equal(body.utm_source, 'meta');
+    assert.equal(body.utm_campaign, 'c1');
+    assert.equal(body.fbclid, 'abc');
+    assert.equal(body.campaign_id, '111');
+    assert.equal(body.ad_id, undefined, 'macro não resolvida é descartada');
+    assert.equal(body._fbc, 'fb.1.1.abc');
+    assert.equal(body._fbp, 'fb.1.1.browser');
+    assert.equal(body.landingUrl, url);
+    assert.ok(Object.keys(body).length > 15, 'respostas do quiz incluídas');
+
+    assert.equal(await app.sendToUmbrella(lead, 'sig-2'), true, 'dados editados são reenviados');
+    assert.equal(calls.length, 3);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('Umbrella desativado com VITE_UMBRELLA_ENDPOINT=off', async () => {
+  browser('https://quiz.example/');
+  const app = await loadApp({ VITE_UMBRELLA_ENDPOINT: 'off' });
+  let called = false;
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => { called = true; return { ok: true, status: 202 }; };
+  try {
+    assert.equal(await app.sendToUmbrella(app.buildLeadPayload(quiz()), 'sig'), false);
+    assert.equal(called, false);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });
